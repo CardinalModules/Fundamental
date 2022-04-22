@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 using simd::float_4;
@@ -220,67 +220,36 @@ struct VCF : Module {
 	}
 };
 
-/** Arbitrary DPI, standardized for Rack. */
-static constexpr const float _SVG_DPI = 75.f;
-static constexpr const float _MM_PER_IN = 25.4f;
-
-static constexpr inline float _mm2px(float mm) {
-	return mm * (_SVG_DPI / _MM_PER_IN);
-}
-
-template<int _sizepx>
-struct CardinalBlackKnob : RoundKnob {
-	static constexpr const float sizepx = _sizepx;
-	float scale;
-
-	CardinalBlackKnob() {
-		setSvg(Svg::load(asset::plugin(pluginInstance, "res/components/knob-marker.svg")));
-		bg->setSvg(Svg::load(asset::plugin(pluginInstance, "res/components/knob.svg")));
-
-		scale = sizepx / sw->box.size.x;
-		box.size = Vec(sizepx, sizepx);
-		bg->box.size = Vec(sizepx, sizepx);
-	}
-
-	void draw(const DrawArgs& args) override{
-		nvgSave(args.vg);
-		nvgScale(args.vg, scale, scale);
-		RoundKnob::draw(args);
-		nvgRestore(args.vg);
-	}
-};
-
-typedef CardinalBlackKnob<42> CardinalBigBlackKnob;
-typedef CardinalBlackKnob<20> CardinalSmallBlackKnob;
-
 struct VCFWidget : ModuleWidget {
+	static constexpr const int kWidth = 7;
+	static constexpr const float kPosLeft = 25.5f;
+	static constexpr const float kPosCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+	static constexpr const float kPosRight = 78.5f;
+
 	VCFWidget(VCF* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/VCF.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		const constexpr float kJackHalfWidth = 16;
-		const constexpr float kBigKnobHalfHeight = CardinalBigBlackKnob::sizepx/2;
+		addParam(createParamCentered<CardinalBigBlackKnob>(Vec(kPosLeft, RACK_GRID_HEIGHT - 292.81 + 5.926 + CardinalBigBlackKnob::kHalfSize), module, VCF::FREQ_PARAM));
+		addParam(createParamCentered<CardinalBigBlackKnob>(Vec(kPosRight, RACK_GRID_HEIGHT - 292.81 + 5.926 + CardinalBigBlackKnob::kHalfSize), module, VCF::RES_PARAM));
+		addParam(createParamCentered<CardinalBigBlackKnob>(Vec(kPosCenter, RACK_GRID_HEIGHT - 176.76 + 5.727 + CardinalBigBlackKnob::kHalfSize), module, VCF::DRIVE_PARAM));
 
-		addParam(createParamCentered<CardinalBigBlackKnob>(Vec(24.957, RACK_GRID_HEIGHT - 292.81 + 5.926 + kBigKnobHalfHeight), module, VCF::FREQ_PARAM));
-		addParam(createParamCentered<CardinalBigBlackKnob>(Vec(78.353, RACK_GRID_HEIGHT - 292.81 + 5.926 + kBigKnobHalfHeight), module, VCF::RES_PARAM));
-		addParam(createParamCentered<CardinalBigBlackKnob>(Vec(50.922, RACK_GRID_HEIGHT - 176.76 + 5.727 + kBigKnobHalfHeight), module, VCF::DRIVE_PARAM));
+		addParam(createParamCentered<CardinalSmallBlackKnob>(Vec(kPosLeft, RACK_GRID_HEIGHT - 227.432 + 0.707/2), module, VCF::FREQ_CV_PARAM));
+		addParam(createParamCentered<CardinalSmallBlackKnob>(Vec(kPosRight, RACK_GRID_HEIGHT - 227.432 + 0.707/2), module, VCF::RES_CV_PARAM));
+		addParam(createParamCentered<CardinalSmallBlackKnob>(Vec(kPosCenter, RACK_GRID_HEIGHT - 115.930 + 0.707/2), module, VCF::DRIVE_CV_PARAM));
 
-		addParam(createParamCentered<CardinalSmallBlackKnob>(Vec(24.957, RACK_GRID_HEIGHT - 227.432 + 0.707/2), module, VCF::FREQ_CV_PARAM));
-		addParam(createParamCentered<CardinalSmallBlackKnob>(Vec(78.353, RACK_GRID_HEIGHT - 227.432 + 0.707/2), module, VCF::RES_CV_PARAM));
-		addParam(createParamCentered<CardinalSmallBlackKnob>(Vec(50.922, RACK_GRID_HEIGHT - 115.930 + 0.707/2), module, VCF::DRIVE_CV_PARAM));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosLeft, RACK_GRID_HEIGHT - 185.063 - kRACK_JACK_HALF_SIZE), module, VCF::FREQ_INPUT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosRight, RACK_GRID_HEIGHT - 185.063 - kRACK_JACK_HALF_SIZE), module, VCF::RES_INPUT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosCenter, RACK_GRID_HEIGHT - 73.769 - kRACK_JACK_HALF_SIZE), module, VCF::DRIVE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosCenter, RACK_GRID_HEIGHT - 327.925 - 6.738 + kRACK_JACK_HALF_SIZE), module, VCF::IN_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(Vec(24.957, RACK_GRID_HEIGHT - 185.063 - kJackHalfWidth), module, VCF::FREQ_INPUT));
-		addInput(createInputCentered<PJ301MPort>(Vec(78.353, RACK_GRID_HEIGHT - 185.063 - kJackHalfWidth), module, VCF::RES_INPUT));
-		addInput(createInputCentered<PJ301MPort>(Vec(50.922, RACK_GRID_HEIGHT - 73.769 - kJackHalfWidth), module, VCF::DRIVE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(Vec(50.922, RACK_GRID_HEIGHT - 327.925 - 6.738 + kJackHalfWidth), module, VCF::IN_INPUT));
-
-		addOutput(createOutputCentered<PJ301MPort>(Vec(12.5 + 36/2, RACK_GRID_HEIGHT - 19.832 - 40/2), module, VCF::LPF_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(Vec(56.5 + 36/2, RACK_GRID_HEIGHT - 19.832 - 40/2), module, VCF::HPF_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(12.5f + 18.f, kRACK_GRID_HEIGHT - 36.f), module, VCF::LPF_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(56.5f + 18.f, kRACK_GRID_HEIGHT - 36.f), module, VCF::HPF_OUTPUT));
 	}
 };
 
