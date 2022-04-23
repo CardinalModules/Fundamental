@@ -254,6 +254,9 @@ struct ADSRDisplay : Widget {
 
 
 struct ADSRWidget : ModuleWidget {
+	typedef CardinalBlackKnob<28> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
 	static constexpr const int kWidth = 9;
 	static constexpr const float kBorderPadding = 5.f;
 	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
@@ -269,13 +272,10 @@ struct ADSRWidget : ModuleWidget {
 
 	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
 
-	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 309.f - 11.f;
-	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 200.f - 14.f;
-	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 148.f - 9.f;
-	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 120.f - 11.f;
-
-	typedef CardinalBlackKnob<28> BigKnob;
-	typedef CardinalBlackKnob<18> SmallKnob;
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 309.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 200.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 148.f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 120.f - kRACK_JACK_HALF_SIZE;
 
 	ADSRWidget(ADSR* module) {
 		setModule(module);
@@ -305,7 +305,7 @@ struct ADSRWidget : ModuleWidget {
 		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of4, kVerticalPos4), module, ADSR::SUSTAIN_INPUT));
 		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos4of4, kVerticalPos4), module, ADSR::RELEASE_INPUT));
 
-		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kRACK_GRID_HEIGHT - 26.f - 11.f), module, ADSR::ENVELOPE_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE), module, ADSR::ENVELOPE_OUTPUT));
 
 		ADSRDisplay* display = createWidget<ADSRDisplay>(Vec(5.75f, kRACK_GRID_HEIGHT - 304.f));
 		display->module = module;

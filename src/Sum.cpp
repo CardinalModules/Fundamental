@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 struct Sum : Module {
@@ -111,37 +111,44 @@ struct SumChannelDisplay : ChannelDisplay {
 
 
 struct SumWidget : ModuleWidget {
+	typedef CardinalBlackKnob<30> Knob;
+
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 308.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 75.f - Knob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 25.f - kRACK_JACK_HALF_SIZE;
+
 	SumWidget(Sum* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Sum.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 64.284)), module, Sum::LEVEL_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos1), module, Sum::POLY_INPUT));
+		addParam(createParamCentered<Knob>(Vec(kHorizontalCenter, kVerticalPos2), module, Sum::LEVEL_PARAM));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos3), module, Sum::MONO_OUTPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 96.798)), module, Sum::POLY_INPUT));
+		/* TODO
+		addChild(createLightCentered<SmallSimpleLight<RedLight>>(Vec(kHorizontalCenter, 18.081), module, Sum::VU_LIGHTS + 0));
+		addChild(createLightCentered<SmallSimpleLight<YellowLight>>(Vec(kHorizontalCenter, 23.378), module, Sum::VU_LIGHTS + 1));
+		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(kHorizontalCenter, 28.676), module, Sum::VU_LIGHTS + 2));
+		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(kHorizontalCenter, 33.973), module, Sum::VU_LIGHTS + 3));
+		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(kHorizontalCenter, 39.271), module, Sum::VU_LIGHTS + 4));
+		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(kHorizontalCenter, 44.568), module, Sum::VU_LIGHTS + 5));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 113.066)), module, Sum::MONO_OUTPUT));
-
-		SumDisplay* display = createWidget<SumDisplay>(mm2px(Vec(0.0, 13.039)));
-		display->box.size = mm2px(Vec(15.241, 36.981));
+		SumDisplay* display = createWidget<SumDisplay>(Vec(0.0, 13.039));
+		display->box.size = Vec(15.241, 36.981);
 		display->module = module;
 		addChild(display);
 
-		addChild(createLightCentered<SmallSimpleLight<RedLight>>(mm2px(Vec(10.808, 18.081)), module, Sum::VU_LIGHTS + 0));
-		addChild(createLightCentered<SmallSimpleLight<YellowLight>>(mm2px(Vec(10.808, 23.378)), module, Sum::VU_LIGHTS + 1));
-		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(10.808, 28.676)), module, Sum::VU_LIGHTS + 2));
-		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(10.808, 33.973)), module, Sum::VU_LIGHTS + 3));
-		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(10.808, 39.271)), module, Sum::VU_LIGHTS + 4));
-		addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(10.808, 44.568)), module, Sum::VU_LIGHTS + 5));
-
-		SumChannelDisplay* channelDisplay = createWidget<SumChannelDisplay>(mm2px(Vec(3.521, 77.191)));
-		channelDisplay->box.size = mm2px(Vec(8.197, 8.197));
+		SumChannelDisplay* channelDisplay = createWidget<SumChannelDisplay>(Vec(3.521, 77.191));
+		channelDisplay->box.size = Vec(8.197, 8.197);
 		channelDisplay->module = module;
 		addChild(channelDisplay);
+		*/
 	}
 };
 

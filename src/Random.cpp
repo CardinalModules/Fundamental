@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 struct Random : Module {
@@ -247,37 +247,63 @@ struct Random : Module {
 
 
 struct RandomWidget : ModuleWidget {
+	typedef CardinalBlackKnob<30> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const int kWidth = 9;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kHorizontalPos1of3 = kBorderPadding + kUsableWidth * 0.1666f;
+	static constexpr const float kHorizontalPos2of3 = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kHorizontalPos3of3 = kBorderPadding + kUsableWidth * 0.8333f;
+
+	static constexpr const float kHorizontalPos1of2 = kBorderPadding + kUsableWidth * 0.333f;
+	static constexpr const float kHorizontalPos2of2 = kBorderPadding + kUsableWidth * 0.666f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 309.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 248.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 220.5f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 192.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 145.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 72.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	RandomWidget(Random* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Random.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(6.479, 33.605)), module, Random::RATE_PARAM, Random::RATE_LIGHT));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(17.315, 33.605)), module, Random::PROB_PARAM, Random::PROB_LIGHT));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(28.152, 33.605)), module, Random::RAND_PARAM, Random::RAND_LIGHT));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(38.98, 33.605)), module, Random::SHAPE_PARAM, Random::SHAPE_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.479, 64.347)), module, Random::RATE_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(17.317, 64.347)), module, Random::PROB_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(28.154, 64.347)), module, Random::RAND_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(38.991, 64.347)), module, Random::SHAPE_CV_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(28.154, 96.859)), module, Random::OFFSET_PARAM, Random::OFFSET_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1of3, kVerticalPos1), module, Random::TRIG_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2of3, kVerticalPos1), module, Random::EXTERNAL_INPUT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos3of3, kVerticalPos1), module, Random::OFFSET_PARAM, Random::OFFSET_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.479, 80.549)), module, Random::RATE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.317, 80.549)), module, Random::PROB_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.154, 80.553)), module, Random::RAND_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.991, 80.557)), module, Random::SHAPE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.479, 96.859)), module, Random::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.317, 96.859)), module, Random::EXTERNAL_INPUT));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1of3, kVerticalPos2), module, Random::RATE_CV_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos2of3, kVerticalPos2), module, Random::RAND_CV_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos3of3, kVerticalPos2), module, Random::SHAPE_CV_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.991, 96.859)), module, Random::TRIG_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.479, 113.115)), module, Random::STEPPED_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(17.317, 113.115)), module, Random::LINEAR_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.154, 113.115)), module, Random::EXPONENTIAL_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.991, 113.115)), module, Random::SMOOTH_OUTPUT));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos1of3, kVerticalPos3), module, Random::RATE_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos2of3, kVerticalPos3), module, Random::RAND_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos3of3, kVerticalPos3), module, Random::SHAPE_PARAM));
+
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1of3, kVerticalPos4), module, Random::RATE_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2of3, kVerticalPos4), module, Random::RAND_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of3, kVerticalPos4), module, Random::SHAPE_INPUT));
+
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1of3, kVerticalPos5), module, Random::PROB_CV_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos2of3, kVerticalPos5), module, Random::PROB_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of3, kVerticalPos5), module, Random::PROB_INPUT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1of3, kVerticalPos6), module, Random::STEPPED_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2of3, kVerticalPos6), module, Random::LINEAR_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos3of3, kVerticalPos6), module, Random::EXPONENTIAL_OUTPUT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1of2, kVerticalPos7), module, Random::SMOOTH_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2of2, kVerticalPos7), module, Random::TRIG_OUTPUT));
 	}
 };
 

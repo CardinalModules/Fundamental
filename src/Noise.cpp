@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 /** Based on "The Voss algorithm"
@@ -177,22 +177,31 @@ struct Noise : Module {
 
 
 struct NoiseWidget : ModuleWidget {
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 299.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 257.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 213.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 169.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 125.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 81.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 37.f - kRACK_JACK_HALF_SIZE;
+
 	NoiseWidget(Noise* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Noise.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 21.897)), module, Noise::WHITE_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 37.102)), module, Noise::PINK_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 52.31)), module, Noise::RED_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 67.53)), module, Noise::VIOLET_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 82.732)), module, Noise::BLUE_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 97.923)), module, Noise::GRAY_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 113.115)), module, Noise::BLACK_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos1), module, Noise::WHITE_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos2), module, Noise::PINK_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos3), module, Noise::RED_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos4), module, Noise::VIOLET_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos5), module, Noise::BLUE_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos6), module, Noise::GRAY_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos7), module, Noise::BLACK_OUTPUT));
 	}
 };
 

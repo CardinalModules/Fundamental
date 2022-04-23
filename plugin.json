@@ -133,17 +133,6 @@
       ]
     },
     {
-      "slug": "Unity",
-      "name": "Unity",
-      "description": "Mixes or averages signals with unity gain",
-      "tags": [
-        "Mixer",
-        "Utility",
-        "Dual"
-      ],
-      "hidden": true
-    },
-    {
       "slug": "Mutes",
       "name": "Mutes",
       "description": "Toggles up to 10 signals",
@@ -249,16 +238,6 @@
       "tags": [
         "Polyphonic",
         "Utility"
-      ]
-    },
-    {
-      "slug": "Viz",
-      "name": "Viz",
-      "description": "Visualizes all channels of a polyphonic cable",
-      "manualUrl": "https://vcvrack.com/Fundamental#Viz",
-      "tags": [
-        "Polyphonic",
-        "Visual"
       ]
     },
     {

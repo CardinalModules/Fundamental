@@ -39,10 +39,10 @@
      inkscape:window-height="1026"
      id="namedview241"
      showgrid="false"
-     inkscape:zoom="7.0264085"
-     inkscape:cx="59.975452"
-     inkscape:cy="49.312148"
-     inkscape:window-x="0"
+     inkscape:zoom="2.4842106"
+     inkscape:cx="56.982636"
+     inkscape:cy="25.935416"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="g1005"
@@ -375,7 +375,7 @@
        transform="translate(26.507809)"
        id="g969">
       <rect
-         style="fill:#d0d0d0;fill-opacity:1"
+         style="fill:#d0d0d0;fill-opacity:0.75294118"
          id="rect25890-0-8-4"
          width="36"
          height="40"
@@ -523,7 +523,7 @@
        transform="translate(-21.492187)"
        id="g1005">
       <rect
-         style="fill:#d0d0d0;fill-opacity:1"
+         style="fill:#d0d0d0;fill-opacity:0.75294119"
          id="rect25890-0-8-4-8"
          width="36"
          height="40"

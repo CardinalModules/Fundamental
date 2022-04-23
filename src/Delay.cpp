@@ -209,14 +209,14 @@ struct DelayWidget : ModuleWidget {
 	typedef CardinalBlackKnob<40> BigKnob;
 	typedef CardinalBlackKnob<18> SmallKnob;
 
-	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 312.f - 11.f;
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 312.f - kRACK_JACK_HALF_SIZE;
 	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 248.f - BigKnob::kHalfSize;
 	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 224.5f - SmallKnob::kHalfSize;
-	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 197.f - 11.f;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 197.f - kRACK_JACK_HALF_SIZE;
 	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 126.f - BigKnob::kHalfSize;
 	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 102.f - SmallKnob::kHalfSize;
-	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 77.f - 11.f;
-	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 26.f - 11.f;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 77.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
 
 	DelayWidget(Delay* module) {
 		setModule(module);

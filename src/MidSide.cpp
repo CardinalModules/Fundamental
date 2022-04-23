@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 struct MidSide : Module {
@@ -88,29 +88,49 @@ struct MidSide : Module {
 
 
 struct MidSideWidget : ModuleWidget {
+	typedef CardinalBlackKnob<40> Knob;
+
+	static constexpr const int kWidth = 5;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f;
+	static constexpr const float kBigKnobOffset = 4.25f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 286.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 230.5f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 192.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 120.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 64.5f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	MidSideWidget(MidSide* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/MidSide.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.285, 25.203)), module, MidSide::ENC_WIDTH_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.285, 80.583)), module, MidSide::DEC_WIDTH_PARAM));
+		addParam(createParamCentered<Knob>(Vec(kPosLeft + kBigKnobOffset * 0.5f, kVerticalPos1), module, MidSide::ENC_WIDTH_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight + kBigKnobOffset * 1.5f, kVerticalPos1), module, MidSide::ENC_WIDTH_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.122, 25.142)), module, MidSide::ENC_WIDTH_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.285, 41.373)), module, MidSide::ENC_LEFT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.122, 41.373)), module, MidSide::ENC_RIGHT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.122, 80.603)), module, MidSide::DEC_WIDTH_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.285, 96.859)), module, MidSide::DEC_MID_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.122, 96.859)), module, MidSide::DEC_SIDES_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos2), module, MidSide::ENC_LEFT_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos2), module, MidSide::ENC_RIGHT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.285, 57.679)), module, MidSide::ENC_MID_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.122, 57.679)), module, MidSide::ENC_SIDES_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.285, 113.115)), module, MidSide::DEC_LEFT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.122, 113.115)), module, MidSide::DEC_RIGHT_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos3), module, MidSide::ENC_MID_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos3), module, MidSide::ENC_SIDES_OUTPUT));
+
+		addParam(createParamCentered<Knob>(Vec(kPosLeft + kBigKnobOffset * 0.5f, kVerticalPos4), module, MidSide::DEC_WIDTH_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight + kBigKnobOffset * 1.5f, kVerticalPos4), module, MidSide::DEC_WIDTH_INPUT));
+
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos5), module, MidSide::DEC_MID_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos5), module, MidSide::DEC_SIDES_INPUT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos6), module, MidSide::DEC_LEFT_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos6), module, MidSide::DEC_RIGHT_OUTPUT));
 	}
 };
 
