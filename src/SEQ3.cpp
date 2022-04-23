@@ -218,8 +218,6 @@ struct SEQ3 : Module {
 		// Step outputs
 		for (int i = 0; i < 8; i++) {
 			outputs[STEP_OUTPUTS + i].setVoltage((index == i) ? 10.f : 0.f);
-			lights[STEP_LIGHTS + 2 * i + 0].setSmoothBrightness(index == i, args.sampleTime);
-			lights[STEP_LIGHTS + 2 * i + 1].setBrightness(i >= numSteps);
 		}
 
 		// Outputs
@@ -233,7 +231,6 @@ struct SEQ3 : Module {
 		outputs[RUN_OUTPUT].setVoltage(runPulse.process(args.sampleTime) ? 10.f : 0.f);
 		outputs[RESET_OUTPUT].setVoltage(resetGate ? 10.f : 0.f);
 
-		lights[CLOCK_LIGHT].setSmoothBrightness(clockGate, args.sampleTime);
 		lights[RUN_LIGHT].setBrightness(running);
 		lights[RESET_LIGHT].setSmoothBrightness(resetGate, args.sampleTime);
 	}
@@ -284,6 +281,34 @@ struct SEQ3 : Module {
 
 
 struct SEQ3Widget : ModuleWidget {
+	typedef CardinalBlackKnob<40> BigKnob;
+	typedef CardinalBlackKnob<27> MediumKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const int kWidth = 22;
+	static constexpr const float kBorderPadding = 11.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kHorizontalAdvance = 18.f + MediumKnob::kHalfSize;
+	static constexpr const float kHorizontalPos1 = kHorizontalAdvance + kUsableWidth * 0.f / 8.f;
+	static constexpr const float kHorizontalPos2 = kHorizontalAdvance + kUsableWidth * 1.f / 8.f;
+	static constexpr const float kHorizontalPos3 = kHorizontalAdvance + kUsableWidth * 2.f / 8.f;
+	static constexpr const float kHorizontalPos4 = kHorizontalAdvance + kUsableWidth * 3.f / 8.f;
+	static constexpr const float kHorizontalPos5 = kHorizontalAdvance + kUsableWidth * 4.f / 8.f;
+	static constexpr const float kHorizontalPos6 = kHorizontalAdvance + kUsableWidth * 5.f / 8.f;
+	static constexpr const float kHorizontalPos7 = kHorizontalAdvance + kUsableWidth * 6.f / 8.f;
+	static constexpr const float kHorizontalPos8 = kHorizontalAdvance + kUsableWidth * 7.f / 8.f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 274.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos1a = kRACK_GRID_HEIGHT - 305.f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos1b = kRACK_GRID_HEIGHT - 278.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 249.f;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 199.f - MediumKnob::kHalfSize - 2;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 159.f - MediumKnob::kHalfSize - 2;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 119.f - MediumKnob::kHalfSize - 2;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 68.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	SEQ3Widget(SEQ3* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/SEQ3.svg")));
@@ -292,85 +317,75 @@ struct SEQ3Widget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(11.753, 26.755)), module, SEQ3::TEMPO_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(32.077, 26.782)), module, SEQ3::TRIG_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(49.372, 34.066)), module, SEQ3::TEMPO_CV_PARAM));
-		addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(88.424, 33.679)), module, SEQ3::RUN_PARAM, SEQ3::RUN_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(62.39, 34.066)), module, SEQ3::STEPS_CV_PARAM));
-		addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(101.441, 33.679)), module, SEQ3::RESET_PARAM, SEQ3::RESET_LIGHT));
+		addParam(createParamCentered<BigKnob>(Vec(38.5f, kVerticalPos1), module, SEQ3::TEMPO_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(77.5f, kVerticalPos1a), module, SEQ3::TEMPO_CV_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(77.5f, kVerticalPos1b), module, SEQ3::TEMPO_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.319, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 0));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23.336, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 1));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(36.354, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 2));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.371, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 3));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(62.389, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 4));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(75.406, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 5));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(88.424, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 6));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(101.441, 46.563)), module, SEQ3::CV_PARAMS + 8 * 0 + 7));
+		addParam(createParamCentered<BigKnob>(Vec(128.5f, kVerticalPos1), module, SEQ3::TRIG_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(165.5f, kVerticalPos1a), module, SEQ3::STEPS_CV_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(165.5f, kVerticalPos1b), module, SEQ3::STEPS_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.319, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 0));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23.336, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 1));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(36.354, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 2));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.371, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 3));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(62.389, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 4));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(75.406, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 5));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(88.424, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 6));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(101.441, 60.607)), module, SEQ3::CV_PARAMS + 8 * 1 + 7));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(264.5f, kVerticalPos1a), module, SEQ3::RUN_PARAM, SEQ3::RUN_LIGHT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(300.5f, kVerticalPos1a), module, SEQ3::RESET_PARAM, SEQ3::RESET_LIGHT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.319, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 0));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23.336, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 1));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(36.354, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 2));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.371, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 3));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(62.389, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 4));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(75.406, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 5));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(88.424, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 6));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(101.441, 74.605)), module, SEQ3::CV_PARAMS + 8 * 2 + 7));
+		addInput(createInputCentered<CardinalPort>(Vec(228.5f, kVerticalPos1b), module, SEQ3::CLOCK_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(264.5f, kVerticalPos1b), module, SEQ3::RUN_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(300.5f, kVerticalPos1b), module, SEQ3::RESET_INPUT));
 
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(10.319, 85.801)), module, SEQ3::GATE_PARAMS + 0, SEQ3::GATE_LIGHTS + 0));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(23.336, 85.801)), module, SEQ3::GATE_PARAMS + 1, SEQ3::GATE_LIGHTS + 1));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(36.354, 85.801)), module, SEQ3::GATE_PARAMS + 2, SEQ3::GATE_LIGHTS + 2));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(49.371, 85.801)), module, SEQ3::GATE_PARAMS + 3, SEQ3::GATE_LIGHTS + 3));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(62.389, 85.801)), module, SEQ3::GATE_PARAMS + 4, SEQ3::GATE_LIGHTS + 4));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(75.406, 85.801)), module, SEQ3::GATE_PARAMS + 5, SEQ3::GATE_LIGHTS + 5));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(88.424, 85.801)), module, SEQ3::GATE_PARAMS + 6, SEQ3::GATE_LIGHTS + 6));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(101.441, 85.801)), module, SEQ3::GATE_PARAMS + 7, SEQ3::GATE_LIGHTS + 7));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos1, kVerticalPos2), module, SEQ3::GATE_PARAMS + 0, SEQ3::GATE_LIGHTS + 0));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos2, kVerticalPos2), module, SEQ3::GATE_PARAMS + 1, SEQ3::GATE_LIGHTS + 1));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos3, kVerticalPos2), module, SEQ3::GATE_PARAMS + 2, SEQ3::GATE_LIGHTS + 2));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos4, kVerticalPos2), module, SEQ3::GATE_PARAMS + 3, SEQ3::GATE_LIGHTS + 3));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos5, kVerticalPos2), module, SEQ3::GATE_PARAMS + 4, SEQ3::GATE_LIGHTS + 4));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos6, kVerticalPos2), module, SEQ3::GATE_PARAMS + 5, SEQ3::GATE_LIGHTS + 5));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos7, kVerticalPos2), module, SEQ3::GATE_PARAMS + 6, SEQ3::GATE_LIGHTS + 6));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos8, kVerticalPos2), module, SEQ3::GATE_PARAMS + 7, SEQ3::GATE_LIGHTS + 7));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.371, 17.307)), module, SEQ3::TEMPO_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(62.389, 17.307)), module, SEQ3::STEPS_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(75.406, 17.42)), module, SEQ3::CLOCK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(88.424, 17.42)), module, SEQ3::RUN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.441, 17.42)), module, SEQ3::RESET_INPUT));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos1, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 0));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos2, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 1));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos3, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 2));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos4, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 3));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos5, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 4));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos6, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 5));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos7, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 6));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos8, kVerticalPos3), module, SEQ3::CV_PARAMS + 8 * 0 + 7));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.319, 96.859)), module, SEQ3::STEP_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(23.336, 96.859)), module, SEQ3::STEP_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.354, 96.859)), module, SEQ3::STEP_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.371, 96.859)), module, SEQ3::STEP_OUTPUTS + 3));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(62.389, 96.859)), module, SEQ3::STEP_OUTPUTS + 4));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(75.406, 96.859)), module, SEQ3::STEP_OUTPUTS + 5));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(88.424, 96.859)), module, SEQ3::STEP_OUTPUTS + 6));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.441, 96.859)), module, SEQ3::STEP_OUTPUTS + 7));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos1, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 0));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos2, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 1));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos3, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 2));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos4, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 3));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos5, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 4));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos6, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 5));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos7, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 6));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos8, kVerticalPos4), module, SEQ3::CV_PARAMS + 8 * 1 + 7));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.319, 113.115)), module, SEQ3::CV_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(23.336, 113.115)), module, SEQ3::CV_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.354, 113.115)), module, SEQ3::CV_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.371, 113.115)), module, SEQ3::TRIG_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(62.389, 113.115)), module, SEQ3::STEPS_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(75.406, 113.115)), module, SEQ3::CLOCK_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(88.424, 113.115)), module, SEQ3::RUN_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.441, 113.115)), module, SEQ3::RESET_OUTPUT));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos1, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 0));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos2, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 1));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos3, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 2));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos4, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 3));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos5, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 4));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos6, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 5));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos7, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 6));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos8, kVerticalPos5), module, SEQ3::CV_PARAMS + 8 * 2 + 7));
 
-		addChild(createLightCentered<SmallLight<YellowLight>>(mm2px(Vec(75.406, 33.497)), module, SEQ3::CLOCK_LIGHT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 2));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos4, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 3));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos5, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 4));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos6, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 5));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos7, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 6));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos8, kVerticalPos6), module, SEQ3::STEP_OUTPUTS + 7));
 
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(14.064, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 0));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(27.084, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 1));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(40.103, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 2));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(53.122, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 3));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(66.142, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 4));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(79.161, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 5));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(92.181, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 6));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(105.2, 93.103)), module, SEQ3::STEP_LIGHTS + 2 * 7));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1, kVerticalPos7), module, SEQ3::STEPS_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos7), module, SEQ3::CLOCK_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos7), module, SEQ3::RUN_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos4, kVerticalPos7), module, SEQ3::RESET_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos5, kVerticalPos7), module, SEQ3::TRIG_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos6, kVerticalPos7), module, SEQ3::CV_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos7, kVerticalPos7), module, SEQ3::CV_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos8, kVerticalPos7), module, SEQ3::CV_OUTPUTS + 2));
 	}
 
 	void appendContextMenu(Menu* menu) override {
