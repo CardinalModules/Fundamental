@@ -42,16 +42,25 @@ struct Split : Module {
 };
 
 
-struct SplitChannelDisplay : ChannelDisplay {
-	Split* module;
-	void step() override {
-		int channels = module ? module->lastChannels : 16;
-		text = string::f("%d", channels);
-	}
-};
-
-
 struct SplitWidget : ModuleWidget {
+	static constexpr const int kWidth = 5;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kPosCenter = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f;
+
+	static constexpr const float kVerticalPosIn = kRACK_GRID_HEIGHT - 300.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 236.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 207.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 178.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 149.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 120.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 91.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 62.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 33.f - kRACK_JACK_HALF_SIZE;
+
 	SplitWidget(Split* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Split.svg")));
@@ -60,31 +69,25 @@ struct SplitWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.281, 21.967)), module, Split::POLY_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPosIn), module, Split::POLY_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 41.995)), module, Split::MONO_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 52.155)), module, Split::MONO_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 62.315)), module, Split::MONO_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 72.475)), module, Split::MONO_OUTPUTS + 3));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 82.635)), module, Split::MONO_OUTPUTS + 4));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 92.795)), module, Split::MONO_OUTPUTS + 5));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 102.955)), module, Split::MONO_OUTPUTS + 6));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.281, 113.115)), module, Split::MONO_OUTPUTS + 7));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 41.995)), module, Split::MONO_OUTPUTS + 8));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 52.155)), module, Split::MONO_OUTPUTS + 9));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 62.315)), module, Split::MONO_OUTPUTS + 10));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 72.475)), module, Split::MONO_OUTPUTS + 11));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 82.635)), module, Split::MONO_OUTPUTS + 12));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 92.795)), module, Split::MONO_OUTPUTS + 13));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 102.955)), module, Split::MONO_OUTPUTS + 14));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.119, 113.115)), module, Split::MONO_OUTPUTS + 15));
-
-		SplitChannelDisplay* display = createWidget<SplitChannelDisplay>(mm2px(Vec(14.02, 18.611)));
-		display->box.size = mm2px(Vec(8.197, 8.197));
-		display->module = module;
-		addChild(display);
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos1), module, Split::MONO_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos2), module, Split::MONO_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos3), module, Split::MONO_OUTPUTS + 2));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos4), module, Split::MONO_OUTPUTS + 3));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos5), module, Split::MONO_OUTPUTS + 4));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos6), module, Split::MONO_OUTPUTS + 5));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos7), module, Split::MONO_OUTPUTS + 6));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos8), module, Split::MONO_OUTPUTS + 7));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos1), module, Split::MONO_OUTPUTS + 8));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos2), module, Split::MONO_OUTPUTS + 9));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos3), module, Split::MONO_OUTPUTS + 10));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos4), module, Split::MONO_OUTPUTS + 11));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos5), module, Split::MONO_OUTPUTS + 12));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos6), module, Split::MONO_OUTPUTS + 13));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos7), module, Split::MONO_OUTPUTS + 14));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos8), module, Split::MONO_OUTPUTS + 15));
 	}
 };
 

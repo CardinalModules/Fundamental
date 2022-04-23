@@ -138,30 +138,43 @@ struct SequentialSwitch : Module {
 struct SequentialSwitch1Widget : ModuleWidget {
 	typedef SequentialSwitch<1, 4> TSequentialSwitch;
 
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 270.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 227.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 184.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 127.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 96.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 65.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 34.f - kRACK_JACK_HALF_SIZE;
+
 	SequentialSwitch1Widget(TSequentialSwitch* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/SequentialSwitch1.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(7.555, 20.942)), module, TSequentialSwitch::STEPS_PARAM));
+		/* TODO
+		addParam(createParamCentered<CKSSThreeHorizontal>(Vec(kHorizontalCenter, 20.942), module, TSequentialSwitch::STEPS_PARAM));
+		*/
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.555, 33.831)), module, TSequentialSwitch::CLOCK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.555, 50.126)), module, TSequentialSwitch::RESET_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.555, 66.379)), module, TSequentialSwitch::IN_INPUTS + 0));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos1), module, TSequentialSwitch::CLOCK_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos2), module, TSequentialSwitch::RESET_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos3), module, TSequentialSwitch::IN_INPUTS + 0));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.555, 82.607)), module, TSequentialSwitch::OUT_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.555, 92.767)), module, TSequentialSwitch::OUT_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.555, 102.927)), module, TSequentialSwitch::OUT_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.555, 113.087)), module, TSequentialSwitch::OUT_OUTPUTS + 3));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos4), module, TSequentialSwitch::OUT_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos5), module, TSequentialSwitch::OUT_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos6), module, TSequentialSwitch::OUT_OUTPUTS + 2));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos7), module, TSequentialSwitch::OUT_OUTPUTS + 3));
 
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.28, 78.863)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 0));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.28, 89.023)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 1));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.28, 99.183)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 2));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.28, 109.343)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 3));
+		/* TODO
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.28, 78.863), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 0));
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.28, 89.023), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 1));
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.28, 99.183), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 2));
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.28, 109.343), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 3));
+		*/
 	}
 };
 
@@ -172,31 +185,43 @@ Model* modelSequentialSwitch1 = createModel<SequentialSwitch<1, 4>, SequentialSw
 struct SequentialSwitch2Widget : ModuleWidget {
 	typedef SequentialSwitch<4, 1> TSequentialSwitch;
 
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 270.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 227.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 178.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 145.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 112.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 79.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	SequentialSwitch2Widget(TSequentialSwitch* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/SequentialSwitch2.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(7.8, 20.942)), module, TSequentialSwitch::STEPS_PARAM));
+		/* TODO
+		addParam(createParamCentered<CKSSThreeHorizontal>(Vec(7.8, 20.942), module, TSequentialSwitch::STEPS_PARAM));
+		*/
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.8, 33.831)), module, TSequentialSwitch::CLOCK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.8, 50.126)), module, TSequentialSwitch::RESET_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.8, 66.379)), module, TSequentialSwitch::IN_INPUTS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.8, 76.539)), module, TSequentialSwitch::IN_INPUTS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.8, 86.699)), module, TSequentialSwitch::IN_INPUTS + 2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.8, 96.859)), module, TSequentialSwitch::IN_INPUTS + 3));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos1), module, TSequentialSwitch::CLOCK_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos2), module, TSequentialSwitch::RESET_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos3), module, TSequentialSwitch::IN_INPUTS + 0));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos4), module, TSequentialSwitch::IN_INPUTS + 1));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos5), module, TSequentialSwitch::IN_INPUTS + 2));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos6), module, TSequentialSwitch::IN_INPUTS + 3));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.8, 113.115)), module, TSequentialSwitch::OUT_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos7), module, TSequentialSwitch::OUT_OUTPUTS + 0));
 
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.526, 63.259)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 0));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.526, 72.795)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 1));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.526, 82.955)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 2));
-		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(mm2px(Vec(11.526, 93.115)), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 3));
+		/* TODO
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.526, 63.259), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 0));
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.526, 72.795), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 1));
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.526, 82.955), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 2));
+		addChild(createLightCentered<TinyLight<YellowRedLight<>>>(Vec(11.526, 93.115), module, TSequentialSwitch::CHANNEL_LIGHTS + 2 * 3));
+		*/
 	}
 };
 

@@ -47,6 +47,25 @@ struct Pulses : Module {
 
 
 struct PulsesWidget : ModuleWidget {
+	static constexpr const int kWidth = 8;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.1333f;
+	static constexpr const float kPosCenter = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.8333f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 301.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 271.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 241.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 211.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 181.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 151.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 121.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 91.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos9 = kRACK_GRID_HEIGHT - 61.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos10 = kRACK_GRID_HEIGHT - 31.f - kRACK_JACK_HALF_SIZE;
+
 	PulsesWidget(Pulses* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Pulses.svg")));
@@ -55,39 +74,39 @@ struct PulsesWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 21.968)), module, Pulses::PUSH_PARAMS + 0, Pulses::PUSH_LIGHTS + 0));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 32.095)), module, Pulses::PUSH_PARAMS + 1, Pulses::PUSH_LIGHTS + 1));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 42.222)), module, Pulses::PUSH_PARAMS + 2, Pulses::PUSH_LIGHTS + 2));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 52.35)), module, Pulses::PUSH_PARAMS + 3, Pulses::PUSH_LIGHTS + 3));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 62.477)), module, Pulses::PUSH_PARAMS + 4, Pulses::PUSH_LIGHTS + 4));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 72.605)), module, Pulses::PUSH_PARAMS + 5, Pulses::PUSH_LIGHTS + 5));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 82.732)), module, Pulses::PUSH_PARAMS + 6, Pulses::PUSH_LIGHTS + 6));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 92.86)), module, Pulses::PUSH_PARAMS + 7, Pulses::PUSH_LIGHTS + 7));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 102.987)), module, Pulses::PUSH_PARAMS + 8, Pulses::PUSH_LIGHTS + 8));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(7.28, 113.115)), module, Pulses::PUSH_PARAMS + 9, Pulses::PUSH_LIGHTS + 9));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos1), module, Pulses::PUSH_PARAMS + 0, Pulses::PUSH_LIGHTS + 0));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos2), module, Pulses::PUSH_PARAMS + 1, Pulses::PUSH_LIGHTS + 1));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos3), module, Pulses::PUSH_PARAMS + 2, Pulses::PUSH_LIGHTS + 2));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos4), module, Pulses::PUSH_PARAMS + 3, Pulses::PUSH_LIGHTS + 3));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos5), module, Pulses::PUSH_PARAMS + 4, Pulses::PUSH_LIGHTS + 4));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos6), module, Pulses::PUSH_PARAMS + 5, Pulses::PUSH_LIGHTS + 5));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos7), module, Pulses::PUSH_PARAMS + 6, Pulses::PUSH_LIGHTS + 6));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos8), module, Pulses::PUSH_PARAMS + 7, Pulses::PUSH_LIGHTS + 7));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos9), module, Pulses::PUSH_PARAMS + 8, Pulses::PUSH_LIGHTS + 8));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos10), module, Pulses::PUSH_PARAMS + 9, Pulses::PUSH_LIGHTS + 9));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 21.968)), module, Pulses::TRIG_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 32.095)), module, Pulses::TRIG_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 42.222)), module, Pulses::TRIG_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 52.35)), module, Pulses::TRIG_OUTPUTS + 3));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 62.477)), module, Pulses::TRIG_OUTPUTS + 4));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 72.605)), module, Pulses::TRIG_OUTPUTS + 5));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 82.732)), module, Pulses::TRIG_OUTPUTS + 6));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 92.86)), module, Pulses::TRIG_OUTPUTS + 7));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 102.987)), module, Pulses::TRIG_OUTPUTS + 8));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.313, 113.115)), module, Pulses::TRIG_OUTPUTS + 9));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 21.968)), module, Pulses::GATE_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 32.095)), module, Pulses::GATE_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 42.222)), module, Pulses::GATE_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 52.35)), module, Pulses::GATE_OUTPUTS + 3));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 62.477)), module, Pulses::GATE_OUTPUTS + 4));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 72.605)), module, Pulses::GATE_OUTPUTS + 5));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 82.732)), module, Pulses::GATE_OUTPUTS + 6));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 92.86)), module, Pulses::GATE_OUTPUTS + 7));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 102.987)), module, Pulses::GATE_OUTPUTS + 8));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.321, 113.115)), module, Pulses::GATE_OUTPUTS + 9));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos1), module, Pulses::TRIG_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos2), module, Pulses::TRIG_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos3), module, Pulses::TRIG_OUTPUTS + 2));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos4), module, Pulses::TRIG_OUTPUTS + 3));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos5), module, Pulses::TRIG_OUTPUTS + 4));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos6), module, Pulses::TRIG_OUTPUTS + 5));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos7), module, Pulses::TRIG_OUTPUTS + 6));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos8), module, Pulses::TRIG_OUTPUTS + 7));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos9), module, Pulses::TRIG_OUTPUTS + 8));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos10), module, Pulses::TRIG_OUTPUTS + 9));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos1), module, Pulses::GATE_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos2), module, Pulses::GATE_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos3), module, Pulses::GATE_OUTPUTS + 2));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos4), module, Pulses::GATE_OUTPUTS + 3));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos5), module, Pulses::GATE_OUTPUTS + 4));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos6), module, Pulses::GATE_OUTPUTS + 5));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos7), module, Pulses::GATE_OUTPUTS + 6));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos8), module, Pulses::GATE_OUTPUTS + 7));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos9), module, Pulses::GATE_OUTPUTS + 8));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos10), module, Pulses::GATE_OUTPUTS + 9));
 
 	}
 };

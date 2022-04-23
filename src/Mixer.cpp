@@ -93,26 +93,37 @@ struct Mixer : Module {
 
 
 struct MixerWidget : ModuleWidget {
+	typedef CardinalBlackKnob<30> Knob;
+
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 308.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 276.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 244.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 212.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 180.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 148.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 75.f - Knob::kHalfSize;
+	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	MixerWidget(Mixer* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Mixer.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 24.723)), module, Mixer::LEVEL_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos1), module, Mixer::IN_INPUTS + 0));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos2), module, Mixer::IN_INPUTS + 1));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos3), module, Mixer::IN_INPUTS + 2));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos4), module, Mixer::IN_INPUTS + 3));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos5), module, Mixer::IN_INPUTS + 4));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos6), module, Mixer::IN_INPUTS + 5));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 46.059)), module, Mixer::IN_INPUTS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 56.219)), module, Mixer::IN_INPUTS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 66.379)), module, Mixer::IN_INPUTS + 2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 76.539)), module, Mixer::IN_INPUTS + 3));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 86.699)), module, Mixer::IN_INPUTS + 4));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 96.859)), module, Mixer::IN_INPUTS + 5));
+		addParam(createParamCentered<Knob>(Vec(kHorizontalCenter, kVerticalPos7), module, Mixer::LEVEL_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 113.115)), module, Mixer::OUT_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos8), module, Mixer::OUT_OUTPUT));
 	}
 
 	void appendContextMenu(Menu* menu) override {

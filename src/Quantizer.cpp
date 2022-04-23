@@ -233,26 +233,34 @@ struct QuantizerDisplay : LedDisplay {
 
 
 struct QuantizerWidget : ModuleWidget {
+	typedef CardinalBlackKnob<30> Knob;
+
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 308.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 103.f - Knob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	QuantizerWidget(Quantizer* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Quantizer.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 80.551)), module, Quantizer::OFFSET_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos1), module, Quantizer::PITCH_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 96.859)), module, Quantizer::PITCH_INPUT));
+		addParam(createParamCentered<Knob>(Vec(kHorizontalCenter, kVerticalPos2), module, Quantizer::OFFSET_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 113.115)), module, Quantizer::PITCH_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos3), module, Quantizer::PITCH_OUTPUT));
 
-		QuantizerDisplay* quantizerDisplay = createWidget<QuantizerDisplay>(mm2px(Vec(0.0, 13.039)));
-		quantizerDisplay->box.size = mm2px(Vec(15.24, 55.88));
+		/* TODO
+		QuantizerDisplay* quantizerDisplay = createWidget<QuantizerDisplay>(Vec(0.0, 13.039)));
+		quantizerDisplay->box.size = Vec(15.24, 55.88));
 		quantizerDisplay->setModule(module);
 		addChild(quantizerDisplay);
+		*/
 	}
 };
 
