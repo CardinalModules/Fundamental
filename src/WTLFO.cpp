@@ -210,17 +210,6 @@ struct WTLFO : Module {
 
 		// Light
 		if (lightDivider.process()) {
-			if (channels == 1) {
-				float b = 1.f - phases[0][0];
-				lights[PHASE_LIGHT + 0].setSmoothBrightness(b, args.sampleTime * lightDivider.getDivision());
-				lights[PHASE_LIGHT + 1].setSmoothBrightness(b, args.sampleTime * lightDivider.getDivision());
-				lights[PHASE_LIGHT + 2].setBrightness(0.f);
-			}
-			else {
-				lights[PHASE_LIGHT + 0].setBrightness(0.f);
-				lights[PHASE_LIGHT + 1].setBrightness(0.f);
-				lights[PHASE_LIGHT + 2].setBrightness(1.f);
-			}
 			lights[OFFSET_LIGHT].setBrightness(offset);
 			lights[INVERT_LIGHT].setBrightness(invert);
 		}
@@ -249,6 +238,24 @@ struct WTLFO : Module {
 
 
 struct WTLFOWidget : ModuleWidget {
+	typedef CardinalBlackKnob<40> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const int kWidth = 7;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kPosCenter = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 306.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 226.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 196.f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 156.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 110.f;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	WTLFOWidget(WTLFO* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/WTLFO.svg")));
@@ -257,28 +264,30 @@ struct WTLFOWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(8.913, 56.388)), module, WTLFO::FREQ_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(26.647, 56.388)), module, WTLFO::POS_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.987, 80.603)), module, WTLFO::FM_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(17.824, 80.517)), module, WTLFO::INVERT_PARAM, WTLFO::INVERT_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(28.662, 80.536)), module, WTLFO::POS_CV_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(17.824, 96.859)), module, WTLFO::OFFSET_PARAM, WTLFO::OFFSET_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos1), module, WTLFO::RESET_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos1), module, WTLFO::CLOCK_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.987, 96.859)), module, WTLFO::FM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.662, 96.859)), module, WTLFO::POS_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.987, 113.115)), module, WTLFO::CLOCK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.824, 113.115)), module, WTLFO::RESET_INPUT));
+		addParam(createParamCentered<BigKnob>(Vec(kPosLeft, kVerticalPos2), module, WTLFO::FREQ_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kPosRight, kVerticalPos2), module, WTLFO::POS_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.662, 113.115)), module, WTLFO::WAVE_OUTPUT));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosLeft, kVerticalPos3), module, WTLFO::FM_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosRight, kVerticalPos3), module, WTLFO::POS_CV_PARAM));
 
-		addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(17.731, 49.409)), module, WTLFO::PHASE_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos4), module, WTLFO::FM_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos4), module, WTLFO::POS_INPUT));
 
-		WTDisplay<WTLFO>* display = createWidget<WTDisplay<WTLFO>>(mm2px(Vec(0.004, 13.04)));
-		display->box.size = mm2px(Vec(35.56, 29.224));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos5), module, WTLFO::INVERT_PARAM, WTLFO::INVERT_LIGHT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosRight, kVerticalPos5), module, WTLFO::OFFSET_PARAM, WTLFO::OFFSET_LIGHT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos6), module, WTLFO::WAVE_OUTPUT));
+
+		/* TODO
+		WTDisplay<WTLFO>* display = createWidget<WTDisplay<WTLFO>>(Vec(0.004, 13.04));
+		display->box.size = Vec(35.56, 29.224);
 		display->module = module;
 		addChild(display);
+		*/
 	}
 
 	void appendContextMenu(Menu* menu) override {

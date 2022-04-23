@@ -99,9 +99,6 @@ struct WTVCO : Module {
 	void clearOutput() {
 		outputs[WAVE_OUTPUT].setVoltage(0.f);
 		outputs[WAVE_OUTPUT].setChannels(1);
-		lights[PHASE_LIGHT + 0].setBrightness(0.f);
-		lights[PHASE_LIGHT + 1].setBrightness(0.f);
-		lights[PHASE_LIGHT + 2].setBrightness(0.f);
 	}
 
 	float getWave(float index, float pos, float octave) {
@@ -242,17 +239,6 @@ struct WTVCO : Module {
 
 		// Light
 		if (lightDivider.process()) {
-			if (channels == 1) {
-				float b = std::sin(2 * M_PI * phases[0][0]);
-				lights[PHASE_LIGHT + 0].setSmoothBrightness(-b, args.sampleTime * lightDivider.getDivision());
-				lights[PHASE_LIGHT + 1].setSmoothBrightness(b, args.sampleTime * lightDivider.getDivision());
-				lights[PHASE_LIGHT + 2].setBrightness(0.f);
-			}
-			else {
-				lights[PHASE_LIGHT + 0].setBrightness(0.f);
-				lights[PHASE_LIGHT + 1].setBrightness(0.f);
-				lights[PHASE_LIGHT + 2].setBrightness(1.f);
-			}
 			lights[LINEAR_LIGHT].setBrightness(linear);
 			lights[SOFT_LIGHT].setBrightness(soft);
 		}
@@ -281,6 +267,24 @@ struct WTVCO : Module {
 
 
 struct WTVCOWidget : ModuleWidget {
+	typedef CardinalBlackKnob<40> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const int kWidth = 7;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kPosCenter = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 306.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 226.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 196.f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 156.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 101.f;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	WTVCOWidget(WTVCO* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/WTVCO.svg")));
@@ -289,28 +293,30 @@ struct WTVCOWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(8.915, 56.388)), module, WTVCO::FREQ_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(26.645, 56.388)), module, WTVCO::POS_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.897, 80.603)), module, WTVCO::FM_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(17.734, 80.603)), module, WTVCO::LINEAR_PARAM, WTVCO::LINEAR_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(28.571, 80.603)), module, WTVCO::POS_CV_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(17.734, 96.859)), module, WTVCO::SOFT_PARAM, WTVCO::SOFT_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos1), module, WTVCO::PITCH_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos1), module, WTVCO::SYNC_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.897, 96.813)), module, WTVCO::FM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.571, 96.859)), module, WTVCO::POS_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.897, 113.115)), module, WTVCO::PITCH_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.734, 113.115)), module, WTVCO::SYNC_INPUT));
+		addParam(createParamCentered<BigKnob>(Vec(kPosLeft, kVerticalPos2), module, WTVCO::FREQ_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kPosRight, kVerticalPos2), module, WTVCO::POS_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.571, 113.115)), module, WTVCO::WAVE_OUTPUT));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosLeft, kVerticalPos3), module, WTVCO::FM_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosRight, kVerticalPos3), module, WTVCO::POS_CV_PARAM));
 
-		addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(17.733, 49.409)), module, WTVCO::PHASE_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos4), module, WTVCO::FM_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos4), module, WTVCO::POS_INPUT));
 
-		WTDisplay<WTVCO>* display = createWidget<WTDisplay<WTVCO>>(mm2px(Vec(0.004, 13.04)));
-		display->box.size = mm2px(Vec(35.56, 29.224));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kVerticalPos5), module, WTVCO::LINEAR_PARAM, WTVCO::LINEAR_LIGHT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosRight, kVerticalPos5), module, WTVCO::SOFT_PARAM, WTVCO::SOFT_LIGHT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosCenter, kVerticalPos6), module, WTVCO::WAVE_OUTPUT));
+
+		/* TODO
+		WTDisplay<WTVCO>* display = createWidget<WTDisplay<WTVCO>>(Vec(0.004, 13.04));
+		display->box.size = Vec(35.56, 29.224);
 		display->module = module;
 		addChild(display);
+		*/
 	}
 
 	void appendContextMenu(Menu* menu) override {

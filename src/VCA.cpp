@@ -110,6 +110,27 @@ struct VCA : Module {
 
 
 struct VCAWidget : ModuleWidget {
+	typedef CardinalBlackKnob<35> Knob;
+
+	static constexpr const int kWidth = 5;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kOffsetX = 11.f; // FIXME
+	static constexpr const float kOffsetY = 11.f; // FIXME
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f - kOffsetX;
+	static constexpr const float kPosCenter = kBorderPadding + kUsableWidth * 0.5f - kOffsetX;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f - kOffsetX;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 312.f - kRACK_JACK_HALF_SIZE - kOffsetY;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 280.f - kRACK_JACK_HALF_SIZE - kOffsetY;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 233.f - Knob::kHalfSize - kOffsetY*2;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 197.f - kRACK_JACK_HALF_SIZE - kOffsetY;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 140.f - kRACK_JACK_HALF_SIZE - kOffsetY;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 108.f - kRACK_JACK_HALF_SIZE - kOffsetY;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 61.f - Knob::kHalfSize - kOffsetY*2;
+	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE - kOffsetY;
+
 	VCAWidget(VCA* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/VCA.svg")));
@@ -118,20 +139,18 @@ struct VCAWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createParam<RoundLargeBlackKnob>(mm2px(Vec(6.35, 19.11753)), module, VCA::LEVEL1_PARAM));
-		addParam(createParam<RoundLargeBlackKnob>(mm2px(Vec(6.35, 74.80544)), module, VCA::LEVEL2_PARAM));
+		addInput(createInput<CardinalPort>(Vec(kPosCenter, kVerticalPos1), module, VCA::IN1_INPUT));
+		addInput(createInput<CardinalPort>(Vec(kPosLeft, kVerticalPos2), module, VCA::EXP1_INPUT));
+		addInput(createInput<CardinalPort>(Vec(kPosRight, kVerticalPos2), module, VCA::LIN1_INPUT));
+		addParam(createParam<Knob>(Vec(kPosCenter - 7.f /* FIXME */, kVerticalPos3), module, VCA::LEVEL1_PARAM));
+		addOutput(createOutput<CardinalPort>(Vec(kPosCenter, kVerticalPos4), module, VCA::OUT1_OUTPUT));
 
-		addInput(createInput<PJ301MPort>(mm2px(Vec(2.5907, 38.19371)), module, VCA::EXP1_INPUT));
-		addInput(createInput<PJ301MPort>(mm2px(Vec(14.59752, 38.19371)), module, VCA::LIN1_INPUT));
-		addInput(createInput<PJ301MPort>(mm2px(Vec(2.5907, 52.80642)), module, VCA::IN1_INPUT));
-		addInput(createInput<PJ301MPort>(mm2px(Vec(2.5907, 93.53435)), module, VCA::EXP2_INPUT));
-		addInput(createInput<PJ301MPort>(mm2px(Vec(14.59752, 93.53435)), module, VCA::LIN2_INPUT));
-		addInput(createInput<PJ301MPort>(mm2px(Vec(2.5907, 108.14706)), module, VCA::IN2_INPUT));
-
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(14.59752, 52.80642)), module, VCA::OUT1_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(14.59752, 108.14706)), module, VCA::OUT2_OUTPUT));
+		addInput(createInput<CardinalPort>(Vec(kPosCenter, kVerticalPos5), module, VCA::IN2_INPUT));
+		addInput(createInput<CardinalPort>(Vec(kPosLeft, kVerticalPos6), module, VCA::EXP2_INPUT));
+		addInput(createInput<CardinalPort>(Vec(kPosRight, kVerticalPos6), module, VCA::LIN2_INPUT));
+		addParam(createParam<Knob>(Vec(kPosCenter - 7.f /* FIXME */, kVerticalPos7), module, VCA::LEVEL2_PARAM));
+		addOutput(createOutput<CardinalPort>(Vec(kPosCenter, kVerticalPos8), module, VCA::OUT2_OUTPUT));
 	}
 };
 

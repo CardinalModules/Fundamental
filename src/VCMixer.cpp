@@ -23,9 +23,6 @@ struct VCMixer : Module {
 		NUM_LIGHTS
 	};
 
-	dsp::VuMeter2 chMeters[4];
-	dsp::ClockDivider lightDivider;
-
 	VCMixer() {
 		config(0, 0, 0, 0);
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -44,8 +41,6 @@ struct VCMixer : Module {
 		configOutput(MIX_OUTPUT, "Mix");
 		for (int i = 0; i < 4; i++)
 			configOutput(CH_OUTPUTS + i, string::f("Channel %d", i + 1));
-
-		lightDivider.setDivision(512);
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -93,8 +88,6 @@ struct VCMixer : Module {
 				}
 			}
 
-			chMeters[i].process(args.sampleTime, sum / 5.f);
-
 			// Set channel output
 			if (outputs[CH_OUTPUTS + i].isConnected()) {
 				outputs[CH_OUTPUTS + i].setChannels(channels);
@@ -122,19 +115,35 @@ struct VCMixer : Module {
 			outputs[MIX_OUTPUT].setChannels(mixChannels);
 			outputs[MIX_OUTPUT].writeVoltages(mix);
 		}
-
-		// VU lights
-		if (lightDivider.process()) {
-			for (int i = 0; i < 4; i++) {
-				float b = chMeters[i].getBrightness(-24.f, 0.f);
-				lights[LVL_LIGHTS + i].setBrightness(b);
-			}
-		}
 	}
 };
 
 
 struct VCMixerWidget : ModuleWidget {
+	typedef CardinalBlackKnob<40> BigKnob;
+	typedef CardinalBlackKnob<27> MediumKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const int kWidth = 9;
+	static constexpr const float kBorderPadding = 12.5f + kRACK_JACK_HALF_SIZE;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kHorizontalAdvance = 12.5f + kRACK_JACK_HALF_SIZE;
+	static constexpr const float kHorizontalPos1 = kHorizontalAdvance + kUsableWidth * 0.f / 3.f;
+	static constexpr const float kHorizontalPos2 = kHorizontalAdvance + kUsableWidth * 1.f / 3.f;
+	static constexpr const float kHorizontalPos3 = kHorizontalAdvance + kUsableWidth * 2.f / 3.f;
+	static constexpr const float kHorizontalPos4 = kHorizontalAdvance + kUsableWidth * 3.f / 3.f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 309.5f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 245.f - MediumKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 214.f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 186.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 133.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 64.f - kRACK_JACK_HALF_SIZE;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 26.f - kRACK_JACK_HALF_SIZE;
+
 	VCMixerWidget(VCMixer* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/VCMixer.svg")));
@@ -143,29 +152,33 @@ struct VCMixerWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
-		return;
 
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(6.604, 33.605)), module, VCMixer::LVL_PARAMS + 0, VCMixer::LVL_LIGHTS + 0));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(17.441, 33.605)), module, VCMixer::LVL_PARAMS + 1, VCMixer::LVL_LIGHTS + 1));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(28.279, 33.605)), module, VCMixer::LVL_PARAMS + 2, VCMixer::LVL_LIGHTS + 2));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(39.116, 33.605)), module, VCMixer::LVL_PARAMS + 3, VCMixer::LVL_LIGHTS + 3));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(22.776, 64.366)), module, VCMixer::MIX_LVL_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1, kVerticalPos1), module, VCMixer::CH_INPUTS + 0));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos1), module, VCMixer::CH_INPUTS + 1));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos1), module, VCMixer::CH_INPUTS + 2));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos4, kVerticalPos1), module, VCMixer::CH_INPUTS + 3));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.604, 64.347)), module, VCMixer::MIX_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.604, 80.549)), module, VCMixer::CV_INPUTS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.441, 80.549)), module, VCMixer::CV_INPUTS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.279, 80.549)), module, VCMixer::CV_INPUTS + 2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.116, 80.549)), module, VCMixer::CV_INPUTS + 3));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.604, 96.859)), module, VCMixer::CH_INPUTS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.441, 96.859)), module, VCMixer::CH_INPUTS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.279, 96.859)), module, VCMixer::CH_INPUTS + 2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.116, 96.821)), module, VCMixer::CH_INPUTS + 3));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos1, kVerticalPos2), module, VCMixer::LVL_PARAMS + 0));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos2, kVerticalPos2), module, VCMixer::LVL_PARAMS + 1));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos3, kVerticalPos2), module, VCMixer::LVL_PARAMS + 2));
+		addParam(createParamCentered<MediumKnob>(Vec(kHorizontalPos4, kVerticalPos2), module, VCMixer::LVL_PARAMS + 3));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.116, 64.347)), module, VCMixer::MIX_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.604, 113.115)), module, VCMixer::CH_OUTPUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(17.441, 113.115)), module, VCMixer::CH_OUTPUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.279, 113.115)), module, VCMixer::CH_OUTPUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.116, 113.115)), module, VCMixer::CH_OUTPUTS + 3));
+		// FIXME missing cv level params @ kVerticalPos3
+
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1, kVerticalPos4), module, VCMixer::CV_INPUTS + 0));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos4), module, VCMixer::CV_INPUTS + 1));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos4), module, VCMixer::CV_INPUTS + 2));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos4, kVerticalPos4), module, VCMixer::CV_INPUTS + 3));
+
+		addInput(createInputCentered<CardinalPort>(Vec(14.925f + kRACK_JACK_HALF_SIZE, kVerticalPos5), module, VCMixer::MIX_CV_INPUT));
+		// FIXME missing cv mix param @ 52.74 + SmallKnob::kHalfSize / kVerticalPos5
+		addParam(createParamCentered<BigKnob>(Vec(86.f + BigKnob::kHalfSize, kVerticalPos5), module, VCMixer::MIX_LVL_PARAM));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kVerticalPos6), module, VCMixer::MIX_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1, kVerticalPos7), module, VCMixer::CH_OUTPUTS + 0));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos7), module, VCMixer::CH_OUTPUTS + 1));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos7), module, VCMixer::CH_OUTPUTS + 2));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos4, kVerticalPos7), module, VCMixer::CH_OUTPUTS + 3));
 	}
 };
 
