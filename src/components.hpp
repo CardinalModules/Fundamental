@@ -22,7 +22,7 @@
 static constexpr const float kRACK_GRID_WIDTH = 15.f;
 static constexpr const float kRACK_GRID_HEIGHT = 380.f;
 
-static const constexpr float kRACK_JACK_SIZE = 32.f;
+static const constexpr float kRACK_JACK_SIZE = 22.f;
 static const constexpr float kRACK_JACK_HALF_SIZE = kRACK_JACK_SIZE * 0.5f;
 
 template<int size>
@@ -48,8 +48,11 @@ struct CardinalBlackKnob : RoundKnob {
 	}
 };
 
-typedef CardinalBlackKnob<42> CardinalBigBlackKnob;
-typedef CardinalBlackKnob<20> CardinalSmallBlackKnob;
+struct CardinalPort : app::SvgPort {
+	CardinalPort() {
+		setSvg(Svg::load(asset::plugin(pluginInstance, "res/components/port.svg")));
+	}
+};
 
 /**
  * Based on VCV Rack components code

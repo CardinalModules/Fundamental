@@ -39,13 +39,13 @@
      inkscape:window-height="1026"
      id="namedview185"
      showgrid="false"
-     inkscape:zoom="7.0264084"
-     inkscape:cx="71.42036"
-     inkscape:cy="201.83338"
-     inkscape:window-x="1920"
+     inkscape:zoom="1.7566021"
+     inkscape:cx="-99.131759"
+     inkscape:cy="140.16702"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg183"
+     inkscape:current-layer="g979"
      inkscape:pagecheckerboard="0" />
   <defs
      id="defs7">
@@ -600,7 +600,7 @@
        id="g963"
        transform="translate(0,-0.1678772)">
       <rect
-         style="fill:#232223;fill-opacity:1"
+         style="fill:#d0d0d0;fill-opacity:1"
          id="rect25890"
          width="36"
          height="40"
@@ -610,20 +610,20 @@
       <g
          aria-label="LPF"
          id="text14110-5-6"
-         style="font-size:8px;line-height:1.25;fill:#929090">
+         style="font-size:8px;line-height:1.25;fill:#000000;fill-opacity:1">
         <path
            d="m 23.640625,328.71078 v -5.72656 h 0.757812 v 5.05078 h 2.820313 v 0.67578 z"
-           style="font-family:Arial;-inkscape-font-specification:Arial"
+           style="font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1"
            id="path2143"
            inkscape:connector-curvature="0" />
         <path
            d="m 28.121094,328.71078 v -5.72656 h 2.160156 q 0.570312,0 0.871094,0.0547 0.421875,0.0703 0.707031,0.26953 0.285156,0.19531 0.457031,0.55078 0.175781,0.35547 0.175781,0.78125 0,0.73047 -0.464843,1.23828 -0.464844,0.50391 -1.679688,0.50391 h -1.46875 v 2.32812 z m 0.757812,-3.0039 h 1.480469 q 0.734375,0 1.042969,-0.27344 0.308593,-0.27344 0.308593,-0.76953 0,-0.35938 -0.183593,-0.61328 -0.179688,-0.25781 -0.476563,-0.33985 Q 30.859375,323.66 30.34375,323.66 h -1.464844 z"
-           style="font-family:Arial;-inkscape-font-specification:Arial"
+           style="font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1"
            id="path2145"
            inkscape:connector-curvature="0" />
         <path
            d="m 33.496094,328.71078 v -5.72656 h 3.863281 V 323.66 h -3.105469 v 1.77344 h 2.6875 v 0.67578 h -2.6875 v 2.60156 z"
-           style="font-family:Arial;-inkscape-font-specification:Arial"
+           style="font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1"
            id="path2147"
            inkscape:connector-curvature="0" />
       </g>
@@ -632,7 +632,7 @@
        id="g979"
        transform="translate(0,-0.1678772)">
       <rect
-         style="fill:#232223;fill-opacity:1"
+         style="fill:#d0d0d0;fill-opacity:1"
          id="rect25890-5"
          width="36"
          height="40"
@@ -642,20 +642,20 @@
       <g
          aria-label="HPF"
          id="text14110-5-6-4"
-         style="font-size:8px;line-height:1.25;fill:#929090">
+         style="font-size:8px;line-height:1.25;fill:#000000;fill-opacity:1">
         <path
            d="m 67.003906,328.71078 v -5.72656 h 0.757813 v 2.35156 h 2.976562 v -2.35156 h 0.757813 v 5.72656 h -0.757813 v -2.69921 h -2.976562 v 2.69921 z"
-           style="font-family:Arial;-inkscape-font-specification:Arial"
+           style="font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1"
            id="path2150"
            inkscape:connector-curvature="0" />
         <path
            d="m 72.757812,328.71078 v -5.72656 h 2.160157 q 0.570312,0 0.871093,0.0547 0.421875,0.0703 0.707032,0.26953 0.285156,0.19531 0.457031,0.55078 0.175781,0.35547 0.175781,0.78125 0,0.73047 -0.464844,1.23828 -0.464843,0.50391 -1.679687,0.50391 h -1.46875 v 2.32812 z m 0.757813,-3.0039 h 1.480469 q 0.734375,0 1.042968,-0.27344 0.308594,-0.27344 0.308594,-0.76953 0,-0.35938 -0.183594,-0.61328 -0.179687,-0.25781 -0.476562,-0.33985 -0.191406,-0.0508 -0.707031,-0.0508 h -1.464844 z"
-           style="font-family:Arial;-inkscape-font-specification:Arial"
+           style="font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1"
            id="path2152"
            inkscape:connector-curvature="0" />
         <path
            d="m 78.132812,328.71078 v -5.72656 h 3.863282 V 323.66 h -3.105469 v 1.77344 h 2.6875 v 0.67578 h -2.6875 v 2.60156 z"
-           style="font-family:Arial;-inkscape-font-specification:Arial"
+           style="font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1"
            id="path2154"
            inkscape:connector-curvature="0" />
       </g>

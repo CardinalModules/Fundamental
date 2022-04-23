@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 struct VCA_1 : Module {
@@ -65,14 +65,25 @@ struct VCA_1 : Module {
 
 
 struct VCA_1VUKnob : SliderKnob {
+	NVGcolor bgColor = nvgRGB(0x12, 0x12, 0x12);
+
+	void draw(const DrawArgs& args) override {
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0.f, 0.f, box.size.x, box.size.y);
+		nvgFillColor(args.vg, bgColor);
+		nvgFill(args.vg);
+		nvgStrokeColor(args.vg, nvgRGB(0x4a, 0x44, 0x44));
+		nvgStrokeWidth(args.vg, 2.f);
+		nvgStroke(args.vg);
+	}
+
 	void drawLayer(const DrawArgs& args, int layer) override {
-		if (layer != 1)
-			return;
+		if (layer != 1) {
+			return SliderKnob::drawLayer(args, layer);
+		}
 
+		Rect r = box.zeroPos().shrink(Vec(2.f, 2.f));
 		VCA_1* module = dynamic_cast<VCA_1*>(this->module);
-
-		Rect r = box.zeroPos();
-		NVGcolor bgColor = nvgRGB(0x12, 0x12, 0x12);
 
 		int channels = module ? module->lastChannels : 1;
 		engine::ParamQuantity* pq = getParamQuantity();
@@ -100,7 +111,7 @@ struct VCA_1VUKnob : SliderKnob {
 				        r.pos.y + r.size.y * (1 - gain),
 				        r.size.x / channels,
 				        r.size.y * gain);
-				nvgFillColor(args.vg, SCHEME_YELLOW);
+				nvgFillColor(args.vg, nvgRGBf(0.76f, 0.11f, 0.22f));
 				nvgFill(args.vg);
 			}
 		}
@@ -121,31 +132,25 @@ struct VCA_1VUKnob : SliderKnob {
 };
 
 
-struct VCA_1Display : LedDisplay {
-};
-
-
 struct VCA_1Widget : ModuleWidget {
+	static constexpr const int kWidth = 3;
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
 	VCA_1Widget(VCA_1* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/VCA-1.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 80.603)), module, VCA_1::CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 96.859)), module, VCA_1::IN_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kRACK_GRID_HEIGHT - 307.f - 11.f), module, VCA_1::IN_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalCenter, kRACK_GRID_HEIGHT - 80.f - 11.f), module, VCA_1::CV_INPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kRACK_GRID_HEIGHT - 25.f - 11.f), module, VCA_1::OUT_OUTPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 113.115)), module, VCA_1::OUT_OUTPUT));
-
-		VCA_1Display* display = createWidget<VCA_1Display>(mm2px(Vec(0.0, 13.039)));
-		display->box.size = mm2px(Vec(15.263, 55.88));
-		addChild(display);
-
-		VCA_1VUKnob* knob = createParam<VCA_1VUKnob>(mm2px(Vec(2.253, 15.931)), module, VCA_1::LEVEL_PARAM);
-		knob->box.size = mm2px(Vec(10.734, 50.253));
+		VCA_1VUKnob* knob = createParam<VCA_1VUKnob>(Vec(6.5f, kRACK_GRID_HEIGHT - 120.f - 176.f), module, VCA_1::LEVEL_PARAM);
+		knob->box.size = Vec(32.f, 176.f);
 		addChild(knob);
 	}
 

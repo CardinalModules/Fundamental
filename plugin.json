@@ -60,8 +60,7 @@
         "VCA",
         "Dual",
         "Polyphonic"
-      ],
-      "hidden": true
+      ]
     },
     {
       "slug": "LFO",

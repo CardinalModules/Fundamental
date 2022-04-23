@@ -411,18 +411,23 @@ struct ScopeDisplay : Widget {
 		}
 	}
 
-	void drawLayer(const DrawArgs& args, int layer) override {
-		if (layer != 1)
-			return;
-
-		// Backgroud
+	void draw(const DrawArgs& args) override {
 		background->draw(args.vg);
+	}
+
+	void drawLayer(const DrawArgs& args, int layer) override {
+		if (layer != 1) {
+			return Widget::drawLayer(args, layer);
+		}
 
 		// Background lines
 		drawBackground(args);
 
-		if (!module)
+		if (!module) {
+			drawStats(args, Vec(0, 0 + 1), "1", statsX);
+			drawStats(args, Vec(0, box.size.y - 15 - 1), "2", statsY);
 			return;
+		}
 
 		float gainX = std::pow(2.f, std::round(module->params[Scope::X_SCALE_PARAM].getValue())) / 10.f;
 		float gainY = std::pow(2.f, std::round(module->params[Scope::Y_SCALE_PARAM].getValue())) / 10.f;
@@ -492,8 +497,8 @@ struct ScopeWidget : ModuleWidget {
 	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 69.f - 11.f;
 	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 26.f - 11.f;
 
-	typedef CardinalBlackKnob<30> ScopeBigKnob;
-	typedef CardinalBlackKnob<20> ScopeSmallKnob;
+	typedef CardinalBlackKnob<30> BigKnob;
+	typedef CardinalBlackKnob<20> SmallKnob;
 
 	ScopeWidget(Scope* module) {
 		setModule(module);
@@ -504,25 +509,25 @@ struct ScopeWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(Vec(kHorizontalPos2, kVerticalPos1), module, Scope::X_INPUT));
-		addInput(createInputCentered<PJ301MPort>(Vec(kHorizontalPos3, kVerticalPos1), module, Scope::Y_INPUT));
-		addInput(createInputCentered<PJ301MPort>(Vec(kHorizontalPos4, kVerticalPos1), module, Scope::TRIG_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos1), module, Scope::X_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos1), module, Scope::Y_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos4, kVerticalPos1), module, Scope::TRIG_INPUT));
 
-		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos1, kVerticalPos2), module, Scope::TIME_PARAM));
-		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos2, kVerticalPos2), module, Scope::X_POS_PARAM));
-		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos3, kVerticalPos2), module, Scope::Y_POS_PARAM));
-		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos4, kVerticalPos2), module, Scope::THRESH_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1, kVerticalPos2), module, Scope::TIME_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos2, kVerticalPos2), module, Scope::X_SCALE_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos3, kVerticalPos2), module, Scope::Y_SCALE_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos4, kVerticalPos2), module, Scope::THRESH_PARAM));
 
 		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos1, kVerticalPos3), module, Scope::LISSAJOUS_PARAM, Scope::LISSAJOUS_LIGHT));
-		addParam(createParamCentered<ScopeSmallKnob>(Vec(kHorizontalPos2, kVerticalPos3), module, Scope::X_SCALE_PARAM));
-		addParam(createParamCentered<ScopeSmallKnob>(Vec(kHorizontalPos3, kVerticalPos3), module, Scope::Y_SCALE_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos2, kVerticalPos3), module, Scope::X_POS_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos3, kVerticalPos3), module, Scope::Y_POS_PARAM));
 		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos4, kVerticalPos3), module, Scope::TRIG_PARAM, Scope::TRIG_LIGHT));
 
-		addOutput(createOutputCentered<PJ301MPort>(Vec(kHorizontalPos2, kVerticalPos4), module, Scope::X_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(Vec(kHorizontalPos3, kVerticalPos4), module, Scope::Y_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2, kVerticalPos4), module, Scope::X_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos3, kVerticalPos4), module, Scope::Y_OUTPUT));
 
 		ScopeDisplay* display = createWidget<ScopeDisplay>(Vec(0.0, 13.039));
-		display->box.pos = Vec(6.593f, kRACK_GRID_HEIGHT - 345.412f);
+		display->box.pos = Vec(5.5f, kRACK_GRID_HEIGHT - 345.412f);
 		display->module = module;
 		display->moduleWidget = this;
 		addChild(display);

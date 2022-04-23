@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 using simd::float_4;
@@ -196,8 +196,18 @@ struct ADSR : Module {
 };
 
 
-struct ADSRDisplay : LedDisplay {
+struct ADSRDisplay : Widget {
 	ADSR* module;
+	std::shared_ptr<Svg> background;
+
+	ADSRDisplay() {
+		background = Svg::load(asset::plugin(pluginInstance, "res/components/ADSR-bg.svg"));
+		box.size = background->getSize();
+	}
+
+	void draw(const DrawArgs& args) override {
+		background->draw(args.vg);
+	}
 
 	void drawLayer(const DrawArgs& args, int layer) override {
 		if (layer == 1) {
@@ -233,45 +243,71 @@ struct ADSRDisplay : LedDisplay {
 			nvgLineCap(args.vg, NVG_ROUND);
 			nvgMiterLimit(args.vg, 2.f);
 			nvgStrokeWidth(args.vg, 1.5f);
-			nvgStrokeColor(args.vg, SCHEME_YELLOW);
+			nvgStrokeColor(args.vg, nvgRGBf(0.76f, 0.11f, 0.22f));
 			nvgStroke(args.vg);
+			return;
 		}
-		LedDisplay::drawLayer(args, layer);
+
+		Widget::drawLayer(args, layer);
 	}
 };
 
 
 struct ADSRWidget : ModuleWidget {
+	static constexpr const int kWidth = 9;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kHorizontalPos1of3 = kBorderPadding + kUsableWidth * 0.1666f;
+	static constexpr const float kHorizontalPos2of3 = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kHorizontalPos3of3 = kBorderPadding + kUsableWidth * 0.8333f;
+
+	static constexpr const float kHorizontalPos1of4 = kBorderPadding + kUsableWidth * 0.125f;
+	static constexpr const float kHorizontalPos2of4 = kBorderPadding + kUsableWidth * 0.375f;
+	static constexpr const float kHorizontalPos3of4 = kBorderPadding + kUsableWidth * 0.625f;
+	static constexpr const float kHorizontalPos4of4 = kBorderPadding + kUsableWidth * 0.875f;
+
+	static constexpr const float kHorizontalCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 309.f - 11.f;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 200.f - 14.f;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 148.f - 9.f;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 120.f - 11.f;
+
+	typedef CardinalBlackKnob<28> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
 	ADSRWidget(ADSR* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/ADSR.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(6.604, 55.454)), module, ADSR::ATTACK_PARAM, ADSR::ATTACK_LIGHT));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(17.441, 55.454)), module, ADSR::DECAY_PARAM, ADSR::DECAY_LIGHT));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(28.279, 55.454)), module, ADSR::SUSTAIN_PARAM, ADSR::SUSTAIN_LIGHT));
-		addParam(createLightParamCentered<VCVLightSlider<YellowLight>>(mm2px(Vec(39.116, 55.454)), module, ADSR::RELEASE_PARAM, ADSR::RELEASE_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.604, 80.603)), module, ADSR::ATTACK_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(17.441, 80.63)), module, ADSR::DECAY_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(28.279, 80.603)), module, ADSR::SUSTAIN_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.119, 80.603)), module, ADSR::RELEASE_CV_PARAM));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(6.604, 113.115)), module, ADSR::PUSH_PARAM, ADSR::PUSH_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1of3, kVerticalPos1), module, ADSR::GATE_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2of3, kVerticalPos1), module, ADSR::RETRIG_INPUT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos3of3, kVerticalPos1), module, ADSR::PUSH_PARAM, ADSR::PUSH_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.604, 96.882)), module, ADSR::ATTACK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.441, 96.859)), module, ADSR::DECAY_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.279, 96.886)), module, ADSR::SUSTAIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.119, 96.89)), module, ADSR::RELEASE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.441, 113.115)), module, ADSR::GATE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.279, 113.115)), module, ADSR::RETRIG_INPUT));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1of4, kVerticalPos2), module, ADSR::ATTACK_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos2of4, kVerticalPos2), module, ADSR::DECAY_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos3of4, kVerticalPos2), module, ADSR::SUSTAIN_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos4of4, kVerticalPos2), module, ADSR::RELEASE_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.119, 113.115)), module, ADSR::ENVELOPE_OUTPUT));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos1of4, kVerticalPos3), module, ADSR::ATTACK_CV_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos2of4, kVerticalPos3), module, ADSR::DECAY_CV_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos3of4, kVerticalPos3), module, ADSR::SUSTAIN_CV_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos4of4, kVerticalPos3), module, ADSR::RELEASE_CV_PARAM));
 
-		ADSRDisplay* display = createWidget<ADSRDisplay>(mm2px(Vec(0.0, 13.039)));
-		display->box.size = mm2px(Vec(45.72, 21.219));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1of4, kVerticalPos4), module, ADSR::ATTACK_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2of4, kVerticalPos4), module, ADSR::DECAY_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of4, kVerticalPos4), module, ADSR::SUSTAIN_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos4of4, kVerticalPos4), module, ADSR::RELEASE_INPUT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalCenter, kRACK_GRID_HEIGHT - 26.f - 11.f), module, ADSR::ENVELOPE_OUTPUT));
+
+		ADSRDisplay* display = createWidget<ADSRDisplay>(Vec(5.75f, kRACK_GRID_HEIGHT - 304.f));
 		display->module = module;
 		addChild(display);
 	}
