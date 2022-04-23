@@ -1,5 +1,5 @@
 #include <string.h>
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 static const int BUFFER_SIZE = 256;
@@ -199,9 +199,10 @@ struct Scope : Module {
 };
 
 
-struct ScopeDisplay : LedDisplay {
+struct ScopeDisplay : Widget {
 	Scope* module;
 	ModuleWidget* moduleWidget;
+	std::shared_ptr<Svg> background;
 	int statsFrame = 0;
 	std::string fontPath;
 
@@ -214,6 +215,8 @@ struct ScopeDisplay : LedDisplay {
 
 	ScopeDisplay() {
 		fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
+		background = Svg::load(asset::plugin(pluginInstance, "res/components/Scope-bg.svg"));
+		box.size = background->getSize();
 	}
 
 	void calculateStats(Stats& stats, int wave, int channels) {
@@ -412,6 +415,9 @@ struct ScopeDisplay : LedDisplay {
 		if (layer != 1)
 			return;
 
+		// Backgroud
+		background->draw(args.vg);
+
 		// Background lines
 		drawBackground(args);
 
@@ -472,33 +478,51 @@ struct ScopeDisplay : LedDisplay {
 
 
 struct ScopeWidget : ModuleWidget {
+	static constexpr const int kWidth = 13;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kHorizontalPos1 = kBorderPadding + kUsableWidth * 0.125f;
+	static constexpr const float kHorizontalPos2 = kBorderPadding + kUsableWidth * 0.375f;
+	static constexpr const float kHorizontalPos3 = kBorderPadding + kUsableWidth * 0.625f;
+	static constexpr const float kHorizontalPos4 = kBorderPadding + kUsableWidth * 0.875f;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 158.f - 11.f;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 108.f - 16.f;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 69.f - 11.f;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 26.f - 11.f;
+
+	typedef CardinalBlackKnob<30> ScopeBigKnob;
+	typedef CardinalBlackKnob<20> ScopeSmallKnob;
+
 	ScopeWidget(Scope* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Scope.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(8.643, 80.603)), module, Scope::LISSAJOUS_PARAM, Scope::LISSAJOUS_LIGHT));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(24.897, 80.551)), module, Scope::X_SCALE_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.147, 80.551)), module, Scope::Y_SCALE_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(57.397, 80.521)), module, Scope::TRIG_PARAM, Scope::TRIG_LIGHT));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.643, 96.819)), module, Scope::TIME_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(24.897, 96.789)), module, Scope::X_POS_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.147, 96.815)), module, Scope::Y_POS_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(57.397, 96.815)), module, Scope::THRESH_PARAM));
+		addInput(createInputCentered<PJ301MPort>(Vec(kHorizontalPos2, kVerticalPos1), module, Scope::X_INPUT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kHorizontalPos3, kVerticalPos1), module, Scope::Y_INPUT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kHorizontalPos4, kVerticalPos1), module, Scope::TRIG_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.643, 113.115)), module, Scope::X_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.023, 113.115)), module, Scope::Y_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(57.397, 113.115)), module, Scope::TRIG_INPUT));
+		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos1, kVerticalPos2), module, Scope::TIME_PARAM));
+		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos2, kVerticalPos2), module, Scope::X_POS_PARAM));
+		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos3, kVerticalPos2), module, Scope::Y_POS_PARAM));
+		addParam(createParamCentered<ScopeBigKnob>(Vec(kHorizontalPos4, kVerticalPos2), module, Scope::THRESH_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.833, 113.115)), module, Scope::X_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.212, 113.115)), module, Scope::Y_OUTPUT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos1, kVerticalPos3), module, Scope::LISSAJOUS_PARAM, Scope::LISSAJOUS_LIGHT));
+		addParam(createParamCentered<ScopeSmallKnob>(Vec(kHorizontalPos2, kVerticalPos3), module, Scope::X_SCALE_PARAM));
+		addParam(createParamCentered<ScopeSmallKnob>(Vec(kHorizontalPos3, kVerticalPos3), module, Scope::Y_SCALE_PARAM));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos4, kVerticalPos3), module, Scope::TRIG_PARAM, Scope::TRIG_LIGHT));
 
-		ScopeDisplay* display = createWidget<ScopeDisplay>(mm2px(Vec(0.0, 13.039)));
-		display->box.size = mm2px(Vec(66.04, 55.88));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(kHorizontalPos2, kVerticalPos4), module, Scope::X_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(kHorizontalPos3, kVerticalPos4), module, Scope::Y_OUTPUT));
+
+		ScopeDisplay* display = createWidget<ScopeDisplay>(Vec(0.0, 13.039));
+		display->box.pos = Vec(6.593f, kRACK_GRID_HEIGHT - 345.412f);
 		display->module = module;
 		display->moduleWidget = this;
 		addChild(display);

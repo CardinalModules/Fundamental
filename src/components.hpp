@@ -50,3 +50,41 @@ struct CardinalBlackKnob : RoundKnob {
 
 typedef CardinalBlackKnob<42> CardinalBigBlackKnob;
 typedef CardinalBlackKnob<20> CardinalSmallBlackKnob;
+
+/**
+ * Based on VCV Rack components code
+ * Copyright (C) 2016-2021 VCV.
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ */
+
+struct CardinalLightLatch : app::SvgSwitch {
+	struct Light : app::ModuleLightWidget {
+		Light() {
+			box.size = mm2px(math::Vec(3, 3));
+			bgColor = nvgRGBA(0x33, 0x33, 0x33, 0xff);
+			borderColor = nvgRGBA(0, 0, 0, 53);
+			addBaseColor(SCHEME_LIGHT_GRAY);
+		}
+	}* light;
+
+	CardinalLightLatch() {
+		momentary = false;
+		latch = true;
+
+		addFrame(Svg::load(asset::plugin(pluginInstance, "res/components/button-off.svg")));
+		addFrame(Svg::load(asset::plugin(pluginInstance, "res/components/button-on.svg")));
+
+		light = new Light;
+		// Move center of light to center of box
+		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
+		addChild(light);
+	}
+
+	app::ModuleLightWidget* getLight() {
+		return light;
+	}
+};
