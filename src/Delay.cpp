@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 #include <samplerate.h>
 
 
@@ -46,7 +46,6 @@ struct Delay : Module {
 	float clockFreq = 1.f;
 	dsp::Timer clockTimer;
 	dsp::SchmittTrigger clockTrigger;
-	float clockPhase = 0.f;
 
 	Delay() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -184,16 +183,6 @@ struct Delay : Module {
 		mix = clamp(mix, 0.f, 1.f);
 		float out = crossfade(in, wet, mix);
 		outputs[MIX_OUTPUT].setVoltage(out);
-
-		// Clock light
-		clockPhase += freq * args.sampleTime;
-		if (clockPhase >= 1.f) {
-			clockPhase -= 1.f;
-			lights[CLOCK_LIGHT].setBrightness(1.f);
-		}
-		else {
-			lights[CLOCK_LIGHT].setBrightnessSmooth(0.f, args.sampleTime);
-		}
 	}
 
 	void paramsFromJson(json_t* rootJ) override {
@@ -210,35 +199,57 @@ struct Delay : Module {
 
 
 struct DelayWidget : ModuleWidget {
+	static constexpr const int kWidth = 9;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f;
+
+	typedef CardinalBlackKnob<40> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 312.f - 11.f;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 248.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 224.5f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 197.f - 11.f;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 126.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 102.f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos7 = kRACK_GRID_HEIGHT - 77.f - 11.f;
+	static constexpr const float kVerticalPos8 = kRACK_GRID_HEIGHT - 26.f - 11.f;
+
 	DelayWidget(Delay* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Delay.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(12.579, 26.747)), module, Delay::TIME_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(32.899, 26.747)), module, Delay::FEEDBACK_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(12.579, 56.388)), module, Delay::TONE_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(32.899, 56.388)), module, Delay::MIX_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.605, 80.561)), module, Delay::TIME_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(17.442, 80.561)), module, Delay::FEEDBACK_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(28.278, 80.561)), module, Delay::TONE_CV_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.115, 80.561)), module, Delay::MIX_CV_PARAM));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos1), module, Delay::IN_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos1), module, Delay::CLOCK_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.605, 96.859)), module, Delay::TIME_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.442, 96.859)), module, Delay::FEEDBACK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.278, 96.819)), module, Delay::TONE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.115, 96.819)), module, Delay::MIX_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.605, 113.115)), module, Delay::IN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.442, 113.115)), module, Delay::CLOCK_INPUT));
+		addParam(createParamCentered<BigKnob>(Vec(kPosLeft, kVerticalPos2), module, Delay::TIME_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kPosRight, kVerticalPos2), module, Delay::FEEDBACK_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.278, 113.115)), module, Delay::WET_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.115, 113.115)), module, Delay::MIX_OUTPUT));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosLeft, kVerticalPos3), module, Delay::TIME_CV_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosRight, kVerticalPos3), module, Delay::FEEDBACK_CV_PARAM));
 
-		addChild(createLightCentered<SmallLight<YellowLight>>(mm2px(Vec(22.738, 16.428)), module, Delay::CLOCK_LIGHT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos4), module, Delay::TIME_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos4), module, Delay::FEEDBACK_INPUT));
+
+		addParam(createParamCentered<BigKnob>(Vec(kPosLeft, kVerticalPos5), module, Delay::TONE_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kPosRight, kVerticalPos5), module, Delay::MIX_PARAM));
+
+		addParam(createParamCentered<SmallKnob>(Vec(kPosLeft, kVerticalPos6), module, Delay::TONE_CV_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kPosRight, kVerticalPos6), module, Delay::MIX_CV_PARAM));
+
+		addInput(createInputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos7), module, Delay::TONE_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos7), module, Delay::MIX_INPUT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosLeft, kVerticalPos8), module, Delay::WET_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kPosRight, kVerticalPos8), module, Delay::MIX_OUTPUT));
 	}
 };
 

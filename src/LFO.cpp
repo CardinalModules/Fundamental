@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 using simd::float_4;
@@ -202,17 +202,6 @@ struct LFO : Module {
 
 		// Light
 		if (lightDivider.process()) {
-			if (channels == 1) {
-				float b = 1.f - phases[0][0];
-				lights[PHASE_LIGHT + 0].setSmoothBrightness(b, args.sampleTime * lightDivider.getDivision());
-				lights[PHASE_LIGHT + 1].setSmoothBrightness(b, args.sampleTime * lightDivider.getDivision());
-				lights[PHASE_LIGHT + 2].setBrightness(0.f);
-			}
-			else {
-				lights[PHASE_LIGHT + 0].setBrightness(0.f);
-				lights[PHASE_LIGHT + 1].setBrightness(0.f);
-				lights[PHASE_LIGHT + 2].setBrightness(1.f);
-			}
 			lights[OFFSET_LIGHT].setBrightness(offset);
 			lights[INVERT_LIGHT].setBrightness(invert);
 		}
@@ -221,33 +210,55 @@ struct LFO : Module {
 
 
 struct LFOWidget : ModuleWidget {
+	static constexpr const int kWidth = 9;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kHorizontalPos1of3 = kBorderPadding + kUsableWidth * 0.2f;
+	static constexpr const float kHorizontalPos2of3 = kBorderPadding + kUsableWidth * 0.5f;
+	static constexpr const float kHorizontalPos3of3 = kBorderPadding + kUsableWidth * 0.8f;
+
+	static constexpr const float kHorizontalPos1of2 = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kHorizontalPos2of2 = kBorderPadding + kUsableWidth * 0.75f;
+
+	typedef CardinalBlackKnob<40> BigKnob;
+	typedef CardinalBlackKnob<18> SmallKnob;
+
+	static constexpr const float kVerticalPos1 = kRACK_GRID_HEIGHT - 272.f - BigKnob::kHalfSize;
+	static constexpr const float kVerticalPos2 = kRACK_GRID_HEIGHT - 242.5f - SmallKnob::kHalfSize;
+	static constexpr const float kVerticalPos3 = kRACK_GRID_HEIGHT - 202.f - 11.f;
+	static constexpr const float kVerticalPos4 = kRACK_GRID_HEIGHT - 139.f - 11.f;
+	static constexpr const float kVerticalPos5 = kRACK_GRID_HEIGHT - 80.f - 11.f;
+	static constexpr const float kVerticalPos6 = kRACK_GRID_HEIGHT - 26.f - 11.f;
+
 	LFOWidget(LFO* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/LFO.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundHugeBlackKnob>(mm2px(Vec(22.902, 29.803)), module, LFO::FREQ_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(22.861, 56.388)), module, LFO::PW_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.604, 80.603)), module, LFO::FM_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(17.441, 80.603)), module, LFO::INVERT_PARAM, LFO::INVERT_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(28.279, 80.603)), module, LFO::OFFSET_PARAM, LFO::OFFSET_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.116, 80.603)), module, LFO::PWM_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1of3, kVerticalPos1), module, LFO::FREQ_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos3of3, kVerticalPos1), module, LFO::PW_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.604, 96.859)), module, LFO::FM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.441, 96.859)), module, LFO::CLOCK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.279, 96.819)), module, LFO::RESET_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.116, 96.819)), module, LFO::PW_INPUT));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos1of3, kVerticalPos2), module, LFO::FM_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos3of3, kVerticalPos2), module, LFO::PWM_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.604, 113.115)), module, LFO::SIN_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(17.441, 113.115)), module, LFO::TRI_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.279, 113.115)), module, LFO::SAW_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.116, 113.115)), module, LFO::SQR_OUTPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1of3, kVerticalPos3), module, LFO::FM_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of3, kVerticalPos3), module, LFO::PW_INPUT));
 
-		addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(31.085, 16.428)), module, LFO::PHASE_LIGHT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos2of3, kRACK_GRID_HEIGHT - 233.f), module, LFO::INVERT_PARAM, LFO::INVERT_LIGHT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kHorizontalPos2of3, kRACK_GRID_HEIGHT - 189.f), module, LFO::OFFSET_PARAM, LFO::OFFSET_LIGHT));
+
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos1of2, kVerticalPos4), module, LFO::CLOCK_INPUT));
+		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2of2, kVerticalPos4), module, LFO::RESET_INPUT));
+
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1of2, kVerticalPos5), module, LFO::SIN_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2of2, kVerticalPos5), module, LFO::TRI_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1of2, kVerticalPos6), module, LFO::SAW_OUTPUT));
+		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos2of2, kVerticalPos6), module, LFO::SQR_OUTPUT));
 	}
 };
 
