@@ -65,9 +65,9 @@ struct CardinalLightLatch : app::SvgSwitch {
 	struct Light : app::ModuleLightWidget {
 		Light() {
 			box.size = mm2px(math::Vec(3, 3));
-			bgColor = nvgRGBA(0x33, 0x33, 0x33, 0xff);
-			borderColor = nvgRGBA(0, 0, 0, 53);
-			addBaseColor(SCHEME_LIGHT_GRAY);
+			bgColor = nvgRGBA(190, 152, 152, 53);
+			borderColor = nvgRGBA(241, 33, 33, 53);
+			addBaseColor(nvgRGB(210, 11, 11));
 		}
 	}* light;
 

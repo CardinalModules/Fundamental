@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "components.hpp"
 
 
 using simd::float_4;
@@ -378,33 +378,48 @@ struct VCO : Module {
 
 
 struct VCOWidget : ModuleWidget {
+	static constexpr const int kWidth = 9;
+	static constexpr const float kBorderPadding = 5.f;
+	static constexpr const float kUsableWidth = kRACK_GRID_WIDTH * kWidth - kBorderPadding * 2.f;
+
+	static constexpr const float kPosLeft = kBorderPadding + kUsableWidth * 0.25f;
+	static constexpr const float kPosCenter = kRACK_GRID_WIDTH * kWidth * 0.5f;
+	static constexpr const float kPosRight = kBorderPadding + kUsableWidth * 0.75f;
+
+	typedef CardinalBlackKnob<40> ScopeBigKnob;
+	typedef CardinalBlackKnob<18> ScopeSmallKnob;
+
 	VCOWidget(VCO* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/VCO.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * kRACK_GRID_WIDTH, kRACK_GRID_HEIGHT - kRACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundHugeBlackKnob>(mm2px(Vec(22.905, 29.808)), module, VCO::FREQ_PARAM));
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(22.862, 56.388)), module, VCO::PW_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.607, 80.603)), module, VCO::FM_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(17.444, 80.603)), module, VCO::LINEAR_PARAM, VCO::LINEAR_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(28.282, 80.603)), module, VCO::SYNC_PARAM, VCO::SOFT_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.118, 80.603)), module, VCO::PW_CV_PARAM));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosCenter, kRACK_GRID_HEIGHT - 308.5f - 11.f), module, VCO::PITCH_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.607, 96.859)), module, VCO::FM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.444, 96.859)), module, VCO::PITCH_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.282, 96.859)), module, VCO::SYNC_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.15, 96.859)), module, VCO::PW_INPUT));
+		addParam(createParamCentered<ScopeBigKnob>(Vec(kPosLeft, kRACK_GRID_HEIGHT - 252.f - ScopeBigKnob::kHalfSize), module, VCO::FREQ_PARAM));
+		addParam(createParamCentered<ScopeBigKnob>(Vec(kPosRight, kRACK_GRID_HEIGHT - 252.f - ScopeBigKnob::kHalfSize), module, VCO::PW_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.607, 113.115)), module, VCO::SIN_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(17.444, 113.115)), module, VCO::TRI_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(28.282, 113.115)), module, VCO::SAW_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.119, 113.115)), module, VCO::SQR_OUTPUT));
+		addParam(createParamCentered<ScopeSmallKnob>(Vec(kPosLeft, kRACK_GRID_HEIGHT - 222.f - ScopeSmallKnob::kHalfSize), module, VCO::FM_PARAM));
+		addParam(createParamCentered<ScopeSmallKnob>(Vec(kPosRight, kRACK_GRID_HEIGHT - 222.f - ScopeSmallKnob::kHalfSize), module, VCO::PW_CV_PARAM));
 
-		addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(31.089, 16.428)), module, VCO::PHASE_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosLeft, kRACK_GRID_HEIGHT - 181.5f - 11.f), module, VCO::FM_INPUT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosRight, kRACK_GRID_HEIGHT - 181.5f - 11.f), module, VCO::PW_INPUT));
+
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosLeft, kRACK_GRID_HEIGHT - 149.f), module, VCO::LINEAR_PARAM, VCO::LINEAR_LIGHT));
+		addParam(createLightParamCentered<CardinalLightLatch>(Vec(kPosRight - 14.f, kRACK_GRID_HEIGHT - 149.f), module, VCO::SYNC_PARAM, VCO::SOFT_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(Vec(kPosRight + 14.f, kRACK_GRID_HEIGHT - 149.f), module, VCO::SYNC_INPUT));
+
+		addOutput(createOutputCentered<PJ301MPort>(Vec(kPosLeft, kRACK_GRID_HEIGHT - 80.f - 11.f), module, VCO::SIN_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(kPosRight, kRACK_GRID_HEIGHT - 80.f - 11.f), module, VCO::TRI_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(kPosLeft, kRACK_GRID_HEIGHT - 26.f - 11.f), module, VCO::SAW_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(Vec(kPosRight, kRACK_GRID_HEIGHT - 26.f - 11.f), module, VCO::SQR_OUTPUT));
+
+		// this is missing on the svg, oops!
+		// addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(Vec(31.089, 16.428), module, VCO::PHASE_LIGHT));
 	}
 };
 
