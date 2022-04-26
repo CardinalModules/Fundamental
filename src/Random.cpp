@@ -294,8 +294,8 @@ struct RandomWidget : ModuleWidget {
 		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos2of3, kVerticalPos4), module, Random::RAND_INPUT));
 		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of3, kVerticalPos4), module, Random::SHAPE_INPUT));
 
-		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1of3, kVerticalPos5), module, Random::PROB_CV_PARAM));
-		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos2of3, kVerticalPos5), module, Random::PROB_PARAM));
+		addParam(createParamCentered<BigKnob>(Vec(kHorizontalPos1of3, kVerticalPos5), module, Random::PROB_PARAM));
+		addParam(createParamCentered<SmallKnob>(Vec(kHorizontalPos2of3, kVerticalPos5), module, Random::PROB_CV_PARAM));
 		addInput(createInputCentered<CardinalPort>(Vec(kHorizontalPos3of3, kVerticalPos5), module, Random::PROB_INPUT));
 
 		addOutput(createOutputCentered<CardinalPort>(Vec(kHorizontalPos1of3, kVerticalPos6), module, Random::STEPPED_OUTPUT));
