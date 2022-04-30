@@ -176,7 +176,7 @@ struct LightButtonTriSwitch : app::Switch {
 		addChild(buttons[2].sw);
 	}
 
-	void onChange(const ChangeEvent& e) {
+	void onChange(const ChangeEvent& e) override {
 		app::Switch::onChange(e);
 
 		if (engine::ParamQuantity* const pq = getParamQuantity())
