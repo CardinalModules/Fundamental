@@ -131,7 +131,7 @@ struct PianoNote : OpaqueWidget {
 		kInit,
 		kDisabled,
 		kEnabledNotPlaying,
-		kEnabledAndPlaying
+		kPlaying
 	} state = kInit;
 
 	int note;
@@ -182,7 +182,7 @@ struct PianoNote : OpaqueWidget {
 		for (int i=0; i<2; ++i) {
 			if (shapes[i] == nullptr)
 				break;
-			shapes[i]->opacity = state == kDisabled ? 0.f : opacities[i] * (state == kEnabledAndPlaying ? 1.f : 0.5f);
+			shapes[i]->opacity = state == kDisabled ? 0.f : opacities[i] * (state == kPlaying ? 1.f : 0.5f);
 		}
 		if (svgFb != nullptr)
 			svgFb->setDirty();
@@ -211,8 +211,8 @@ struct PianoNote : OpaqueWidget {
 			return;
 		}
 
-		const State newstate = !module->enabledNotes[note] ? kDisabled
-							 : module->playingNotes[note] ? kEnabledAndPlaying : kEnabledNotPlaying;
+		const State newstate = module->playingNotes[note] ? kPlaying
+							: module->enabledNotes[note] ? kEnabledNotPlaying : kDisabled;
 
 		if (newstate != state) {
 			state = newstate;
